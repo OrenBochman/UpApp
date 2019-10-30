@@ -36,7 +36,7 @@
             android:name="org.bochman.upapp.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name="org.bochman.upapp.ItemListActivity"
+            android:name="org.bochman.upapp.PlacesListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -48,11 +48,11 @@
         <activity
             android:name="org.bochman.upapp.ItemDetailActivity"
             android:label="@string/title_item_detail"
-            android:parentActivityName="org.bochman.upapp.ItemListActivity"
+            android:parentActivityName="org.bochman.upapp.PlacesListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bochman.upapp.ItemListActivity" />
+                android:value="org.bochman.upapp.PlacesListActivity" />
         </activity>
     </application>
 

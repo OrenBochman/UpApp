@@ -16,7 +16,7 @@ import org.bochman.upapp.dummy.DummyContent;
 
 /**
  * A fragment representing a single Item detail screen.
- * This fragment is either contained in a {@link ItemListActivity}
+ * This fragment is either contained in a {@link PlacesListActivity}
  * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
  * on handsets.
  */
@@ -50,7 +50,7 @@ public class ItemDetailFragment extends Fragment {
             mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
 
             Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+            CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
                 appBarLayout.setTitle(mItem.content);
             }

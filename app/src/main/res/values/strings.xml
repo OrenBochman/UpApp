@@ -18,4 +18,8 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="title_activity_maps">Map</string>
+    <string name="action_search">Search</string>
+    <string name="action_preferences">Preferences</string>
+
+
 </resources>
