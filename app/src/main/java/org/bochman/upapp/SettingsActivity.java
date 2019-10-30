@@ -1,4 +1,4 @@
-package org.bochman.myapplication;
+package org.bochman.upapp;
 
 import android.os.Bundle;
 
