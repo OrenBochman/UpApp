@@ -1,20 +1,33 @@
 package org.bochman.upapp.utils;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
+import org.apache.commons.lang3.StringUtils;
+import org.bochman.upapp.BuildConfig;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.core.content.ContextCompat;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
  * Helper class to handle the Google Places API v2 boiler plate and keep the activities slimmer.
@@ -22,12 +35,31 @@ import java.util.List;
  * Can be initilized in the App, The ViewModel or MainActivity.
  */
 public class PlacesUtils {
+    /**
+     * THe places api client.
+     */
+    private PlacesClient placesClient;
 
-    PlacesClient placesClient;
-    public PlacesUtils(PlacesClient placesClient) {
+    private PlacesUtils(Context ctx) {
+        // Initialize Places.
+        Places.initialize(ctx, BuildConfig.google_maps_key);
 
-         placesClient= placesClient;
+        // Create a new Places client instance.
+        placesClient = Places.createClient(ctx);
+
+
+
+
     }
+    private static PlacesUtils inst =null;
+
+    public static PlacesUtils getInstance(Context ctx){
+           if(inst==null)
+               inst=new PlacesUtils(ctx);
+           return inst;
+    }
+
+
 
 
     /**
@@ -73,15 +105,55 @@ public class PlacesUtils {
     } // autocompleteQuery :-}~
 
 
-   public FetchPlaceRequest fetchPlace(String placeId){
+    /**
+     * TODO: figure out how to set the language to english
+     * @return
+     */
+   public List<Poi> fetchCurrentPlaces(){
+
+        List<Poi> currentPlaces= new ArrayList<>();
 
         // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,
-                Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.PHOTO_METADATAS);
+        List<Place.Field> placeFields = Arrays.asList(
+                Place.Field.ID,
+                Place.Field.NAME,
+                Place.Field.ADDRESS,
+                Place.Field.LAT_LNG,
+                Place.Field.PHOTO_METADATAS);
 
         // Construct a request object, passing the place ID and fields array.
-        FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields).build();
+        //FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields).build();
 
-        return request;
+        FindCurrentPlaceRequest request = FindCurrentPlaceRequest.builder( placeFields).build();
+
+
+       // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+           placesClient.findCurrentPlace(request).addOnSuccessListener(((response) -> {
+               for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                    Poi poi = new Poi(
+                            placeLikelihood.getPlace().getId(),
+                            placeLikelihood.getPlace().getName(),
+                            placeLikelihood.getPlace().getAddress(),
+                            placeLikelihood.getPlace().getLatLng() );
+                   Log.i(Debug.getTag(), String.format("Place '%s' \t has likelihood: %f  - %s ",
+                           StringUtils.rightPad(placeLikelihood.getPlace().getName(),26),
+                           placeLikelihood.getLikelihood(),
+                           placeLikelihood.getPlace().getLatLng() ));
+                   currentPlaces.add(poi);
+
+               }
+           })).addOnFailureListener((exception) -> {
+               if (exception instanceof ApiException) {
+                   ApiException apiException = (ApiException) exception;
+                   Log.e(Debug.getTag(), "Place not found: " + apiException.getStatusCode());
+               }else{
+                   Log.e(Debug.getTag(), "Error: " + exception.toString());
+               }
+           });
+
+       return currentPlaces;
+
     }
+
+
 }

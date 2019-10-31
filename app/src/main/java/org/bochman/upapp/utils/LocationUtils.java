@@ -32,7 +32,7 @@ public class LocationUtils {
      *
      * @param ctx - app context is preferred
      */
-    LocationUtils(Context ctx){
+    public LocationUtils(Context ctx){
         startLocationUpdates(ctx);
     }
 

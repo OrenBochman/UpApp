@@ -1,12 +1,16 @@
 package org.bochman.upapp;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -31,6 +35,7 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
@@ -39,11 +44,17 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.bochman.upapp.dummy.DummyContent;
 import org.bochman.upapp.utils.Debug;
+import org.bochman.upapp.utils.LocationUtils;
+import org.bochman.upapp.utils.PlacesUtils;
+import org.bochman.upapp.utils.Poi;
+import org.bochman.upapp.utils.SharedPreferencesUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
  * An activity representing a list of Places. This activity
@@ -60,10 +71,11 @@ public class PlacesListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
-    /**
-     * THe places api client.
-     */
-    private PlacesClient placesClient;
+
+    //places singlton
+    private PlacesUtils placesUtils;
+
+    Context myContext;
 
     /**
      * The FusedLocation client.
@@ -84,6 +96,7 @@ public class PlacesListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
+        LocationUtils locationutils = new LocationUtils(getApplicationContext());
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -92,25 +105,84 @@ public class PlacesListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-
+        myContext=this;
 
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
 
-        /////TODO: moving to a suitable lifespan handler or ViewModel //////////////////////////////
         // Initialize FusedLocation APIs
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        // Initialize Places APIs
-        Places.initialize(getApplicationContext(), BuildConfig.google_maps_key);
-        // Create a new Places client instance.
-        placesClient = Places.createClient(this);
-        ////////////////////////////////////////////////////////////////////////////////////////////
 
+        String query= SharedPreferencesUtils.getLastSearch(this);
+        PoiSearch(query);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        //32.06684,34.8113214
         setupRecyclerView((RecyclerView) recyclerView);
     }
 
+    void PoiSearch(String query){
+        // get places nearby
+        placesUtils=PlacesUtils.getInstance(getApplicationContext());
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            placesList = placesUtils.fetchCurrentPlaces();
+
+        }    else {
+            getLocationPermission();
+            Toast.makeText(this,"Permission Issue in PoiSearch",Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    List<Poi> placesList;
+
     private Location lastKnownLocation;
 
+    final static int MY_LOCATION_REQUEST_CODE = 1;
+
+    void getLocationPermission(){
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_REQUEST_CODE);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+            placesList = placesUtils.fetchCurrentPlaces();
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_LOCATION_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (permissions.length == 1 &&
+                        permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    placesList = placesUtils.fetchCurrentPlaces();
+                } else {
+                    Log.e(Debug.getTag(),"permissions.length="+permissions.length);
+                    Log.e(Debug.getTag(),"permissions[0]="+permissions[0]);
+                    Log.e(Debug.getTag(),"grantResults[0]="+ PackageManager.PERMISSION_GRANTED);
+                    Toast.makeText(this,"Permission Denied",Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -127,15 +199,18 @@ public class PlacesListActivity extends AppCompatActivity {
                         //text changed apply filtering.
 
                         if(query.length()==0){
-                            //TODO: get current longitude and lattitude.
-
-                            Toast.makeText(getApplicationContext(),"todo: local search ",Toast.LENGTH_SHORT).show();
-                            //TODO: run a retrofit search with the current location.
-
+                            //Save search in shared perferences
+                            SharedPreferencesUtils.setLastSearch("",myContext);
+                            // run a search with the current location.
+                            PoiSearch("");
+                            //Toast.makeText(getApplicationContext(),"todo: local search ",Toast.LENGTH_SHORT).show();
                         }else{
-                            Toast.makeText(getApplicationContext(),"todo: search for "+query,Toast.LENGTH_SHORT).show();
-                            //TODO: run a retrofit search with the query.
 
+                            //Save search in shared perferences
+                            SharedPreferencesUtils.setLastSearch(query,myContext);
+                            // run a search with the current query.
+                            PoiSearch(query);
+                            //Toast.makeText(getApplicationContext(),"todo: search for "+query,Toast.LENGTH_SHORT).show();
                         }
                         return false;
                     }
@@ -223,7 +298,6 @@ public class PlacesListActivity extends AppCompatActivity {
             //set the click handlers
             holder.itemView.setOnClickListener(mOnClickListener);
             holder.itemView.setOnLongClickListener(mOnLongClickListener);
-
         }
 
         @Override
