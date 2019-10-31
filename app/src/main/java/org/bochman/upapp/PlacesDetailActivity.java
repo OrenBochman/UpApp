@@ -18,7 +18,6 @@ public class PlacesDetailActivity extends FragmentActivity implements OnMapReady
 
     private static final String TAG = PlacesDetailActivity.class.getName();
 
-
     private GoogleMap mMap;
 
     @Override

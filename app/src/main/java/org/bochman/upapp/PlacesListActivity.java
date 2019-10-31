@@ -45,8 +45,6 @@ public class PlacesListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
 
-    //private StringBuffer filter=new StringBuffer();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

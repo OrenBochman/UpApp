@@ -130,6 +130,7 @@ public class FavouritesActivity extends AppCompatActivity {
                 // name
                 // address &
                 // photo
+                //favourite button and share.
             }
         }
     }
