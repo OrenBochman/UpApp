@@ -145,6 +145,7 @@ public class PlacesListActivity extends AppCompatActivity {
             public void onClick(View view) {
                 DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                 if (mTwoPane) {
+                    // replace the current fragment with a new fragment with required item.
                     Bundle arguments = new Bundle();
                     arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
                     ItemDetailFragment fragment = new ItemDetailFragment();
@@ -153,6 +154,7 @@ public class PlacesListActivity extends AppCompatActivity {
                             .replace(R.id.item_detail_container, fragment)
                             .commit();
                 } else {
+                    // pass the item to ItemDetailActivity with the intent.
                     Context context = view.getContext();
                     Intent intent = new Intent(context, ItemDetailActivity.class);
                     intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
@@ -171,7 +173,7 @@ public class PlacesListActivity extends AppCompatActivity {
 
                 Log.i(Debug.getTag(), "Long Click");
 
-                //TODO: add to favourites by sending the parceled place extra to favourites activity
+                //add to favourites by passing the item's id with the intent.
                 Context context = view.getContext();
                 Intent intent = new Intent(context, FavouritesActivity.class);
                 intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);

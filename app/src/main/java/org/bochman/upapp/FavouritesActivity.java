@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +21,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.bochman.upapp.dummy.DummyContent;
 import org.bochman.upapp.utils.Debug;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,7 +44,19 @@ public class FavouritesActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.favouritesToolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+
+        String ARG_ITEM_ID = getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID);
+        // Load the dummy content specified by the fragment
+        // arguments. In a real-world scenario, use a Loader
+        // to load content from a content provider.
+        DummyContent.DummyItem mItem = DummyContent.ITEM_MAP.get(ARG_ITEM_ID);
+
+        //fetch the list from
     }
+
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -49,6 +66,32 @@ public class FavouritesActivity extends AppCompatActivity {
         MenuItemCompat.getActionProvider(searchItem);
 
         return true;
+    }
+
+
+    /**
+     * Menu click handler.
+     *
+     * Navigate back to parent activity.
+     *
+     * @param item
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            // This ID represents the Home or Up button. In the case of this
+            // activity, the Up button is shown. Use NavUtils to allow users
+            // to navigate up one level in the application structure. For
+            // more details, see the Navigation pattern on Android Design:
+            //
+            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
+            //
+            NavUtils.navigateUpTo(this, new Intent(this, PlacesListActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     FavouritesActivity.SimpleItemRecyclerViewAdapter adapter;

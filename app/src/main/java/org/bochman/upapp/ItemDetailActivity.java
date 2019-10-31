@@ -55,6 +55,14 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Menu click handler.
+     *
+     * Navigate back to parent activity.
+     *
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
