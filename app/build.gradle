@@ -38,8 +38,7 @@ android {
 
 
             buildConfigField "String", "google_maps_key", getProps("myApiKey")
-            resValue 'string', "google_maps_key", getProps("myApiKey")
-
+            resValue 'string', "google_maps_key", getProps("myApiKeyUnquoted")
 
             // These values are defined only for the release build, which
             // is typically used for full builds and continuous builds.
@@ -62,7 +61,7 @@ android {
             //resValue("string", "build_time", "0")
 
             buildConfigField "String", "google_maps_key", getProps("myApiKey")
-            resValue 'string', "google_maps_key", getProps("myApiKey")
+            resValue 'string', "google_maps_key", getProps("myApiKeyUnquoted")
 
 
             // To avoid using legacy multidex when building from the command line,
