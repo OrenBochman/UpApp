@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SharedPreferences {
+public class SharedPreferencesUtils {
 
     List<Object> getLastSearch(Context ctx){
         android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);

@@ -2,6 +2,7 @@ package org.bochman.upapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,12 +22,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.javafaker.App;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.bochman.upapp.dummy.DummyContent;
 import org.bochman.upapp.utils.Debug;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,7 +60,21 @@ public class PlacesListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    /**
+     * THe places api client.
+     */
+    private PlacesClient placesClient;
 
+    /**
+     * The FusedLocation client.
+     *
+     */
+    private FusedLocationProviderClient fusedLocationClient;
+
+    /** Activity entry point.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +93,23 @@ public class PlacesListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
+
+        /////TODO: moving to a suitable lifespan handler or ViewModel //////////////////////////////
+        // Initialize FusedLocation APIs
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // Initialize Places APIs
+        Places.initialize(getApplicationContext(), BuildConfig.google_maps_key);
+        // Create a new Places client instance.
+        placesClient = Places.createClient(this);
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         setupRecyclerView((RecyclerView) recyclerView);
     }
+
+    private Location lastKnownLocation;
 
 
     @Override
@@ -120,68 +163,35 @@ public class PlacesListActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-
+    /**
+     *  This is the adapter for the places' recyclerview (Boilerplate from a wizard).
+     *
+     *  It should move to its own file - only it accesses the fragment in onClick -- Bummer therefore
+     *  // TODO: use an interface to access the fragment and then pass it into the constructor.
+     *
+     *  It could share an parent with the favourites' recyclerview.
+     *  // TODO: move filtering to parent and use with both favourites & places.
+     */
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            final TextView mIdView;
+            final TextView mContentView;
+
+            ViewHolder(View view) {
+                super(view);
+                mIdView =  view.findViewById(R.id.id_text);
+                mContentView =  view.findViewById(R.id.content);
+                //TODO add cols for distance, name, address, photo
+            } // Viewholder [:-}~
+
+        } // Viewholder :-}8
 
         private final PlacesListActivity mParentActivity;
         private final List<DummyContent.DummyItem> mValues;
         private final List<DummyContent.DummyItem> mValuesFiltered;
         private final boolean mTwoPane;
-
-        public void filter(String filter){
-            mValuesFiltered.clear();
-            for (DummyContent.DummyItem item:mValues) {
-                if(item.content.matches(".*"+filter+".*"))
-                    mValuesFiltered.add(item);
-            }
-            //can check if we really checked too
-            notifyDataSetChanged();
-
-        }
-
-        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                if (mTwoPane) {
-                    // replace the current fragment with a new fragment with required item.
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
-                } else {
-                    // pass the item to ItemDetailActivity with the intent.
-                    Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
-
-                    context.startActivity(intent);
-                }
-            }
-        };
-
-
-        private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener(){
-
-            @Override
-            public boolean onLongClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-
-                Log.i(Debug.getTag(), "Long Click");
-
-                //add to favourites by passing the item's id with the intent.
-                Context context = view.getContext();
-                Intent intent = new Intent(context, FavouritesActivity.class);
-                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
-
-                context.startActivity(intent);
-                return true;
-            }
-        };
 
         SimpleItemRecyclerViewAdapter(PlacesListActivity parent,
                                       List<DummyContent.DummyItem> items,
@@ -191,7 +201,10 @@ public class PlacesListActivity extends AppCompatActivity {
             mTwoPane = twoPane;
             mValuesFiltered= new ArrayList<>();
             mValuesFiltered.addAll(items);
-        }
+
+        } // SimpleItemRecyclerViewAdapter [:-}~
+
+        //// adapter overrides ////////////////////////////////////////////////////////////////////
 
         @NotNull
         @Override
@@ -219,20 +232,77 @@ public class PlacesListActivity extends AppCompatActivity {
 
         }
 
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-            final TextView mContentView;
+        //// adapter event handlers ///////////////////////////////////////////////////////////////
 
-            ViewHolder(View view) {
-                super(view);
-                mIdView =  view.findViewById(R.id.id_text);
-                mContentView =  view.findViewById(R.id.content);
-                //TODO add additional columns for
-                // distance
-                // name
-                // address &
-                // photo
+        // the click listener
+        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                if (mTwoPane) {
+                    // replace the current fragment with a new fragment with required item.
+                    Bundle arguments = new Bundle();
+                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                    ItemDetailFragment fragment = new ItemDetailFragment();
+                    fragment.setArguments(arguments);
+                    mParentActivity.getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.item_detail_container, fragment)
+                            .commit();
+                } else {
+                    // pass the item to ItemDetailActivity with the intent.
+                    Context context = view.getContext();
+                    Intent intent = new Intent(context, ItemDetailActivity.class);
+                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+
+                    context.startActivity(intent);
+                }
             }
+        };
+
+        // the long click lister
+        private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener(){
+
+            @Override
+            public boolean onLongClick(View view) {
+                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+
+                Log.i(Debug.getTag(), "Long Click");
+
+                //add to favourites by passing the item's id with the intent.
+                Context context = view.getContext();
+                Intent intent = new Intent(context, FavouritesActivity.class);
+                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+
+                context.startActivity(intent);
+                return true;
+            }
+        };
+
+
+        /**
+         * Filter and refreshing the adapter.
+         *
+         * This does not change the data in the adapter.
+         *
+         * @param filter
+         */
+        public void filter(String filter){
+            mValuesFiltered.clear();
+            for (DummyContent.DummyItem item:mValues) {
+                if(item.content.matches(".*"+filter+".*"))
+                    mValuesFiltered.add(item);
+            }
+            //can check if we really checked too
+            notifyDataSetChanged();
         }
-    }
-}
+
+    } // SimpleRecyclerViewAdapter :-}8
+
+    //// Location and places helpers ///////////////////////////////////////////////////////////////
+
+
+
+
+
+
+} // PlacesListActivity :-}8

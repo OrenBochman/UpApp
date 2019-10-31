@@ -11,8 +11,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 
 import org.bochman.upapp.R;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class PlacesDetailActivity extends FragmentActivity implements OnMapReadyCallback {
 
