@@ -1,9 +1,14 @@
 apply plugin: 'com.android.application'
 
-def getApiKey() {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("myApiKey");
+def getProps(String propName) {
+    def propsFile = rootProject.file('local.properties')
+    if (propsFile.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        return props[propName]
+    } else {
+        return "";
+    }
 }
 
 android {
@@ -17,12 +22,68 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
+        // Making either of these two values dynamic in the defaultConfig will
+        // require a full APK build and reinstallation because the AndroidManifest.xml
+        // must be updated.
+        versionCode 1
+        versionName "1.0"
+        resConfigs "en"
+
     }
+
+
     buildTypes {
+
         release {
+
+
+            buildConfigField "String", "google_maps_key", getProps("myApiKey")
+            resValue 'string', "google_maps_key", getProps("myApiKey")
+
+
+            // These values are defined only for the release build, which
+            // is typically used for full builds and continuous builds.
+            //buildConfigField("String", "BUILD_TIME", "\"${minutesSinceEpoch}\"")
+            //resValue("string", "build_time", "${minutesSinceEpoch}")
+
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+
         }
+
+        debug {
+            // Use static values for incremental builds to ensure that
+            // resource files and BuildConfig aren't rebuilt with each run.
+            // If these rebuild dynamically, they can interfere with
+            // Apply Changes as well as Gradle UP-TO-DATE checks.
+            //buildConfigField("String", "BUILD_TIME", "\"0\"")
+            //resValue("string", "build_time", "0")
+
+            buildConfigField "String", "google_maps_key", getProps("myApiKey")
+            resValue 'string', "google_maps_key", getProps("myApiKey")
+
+
+            // To avoid using legacy multidex when building from the command line,
+            // set minSdkVersion to 21 or higher. When using Android Studio 2.3 or higher,
+            // the build automatically avoids legacy multidex when deploying to a device running
+            // API level 21 or higher—regardless of what you set as your minSdkVersion.
+            versionNameSuffix "-dev"
+            applicationIdSuffix '.dev'
+
+
+            // The following configuration limits the "dev" flavor to using
+            // English string resources and xxhdpi screen-density resources.
+            //resConfigs "en" "xxhdpi"
+
+            // Disables PNG crunching for the release build type.
+            crunchPngs false
+            ext.alwaysUpdateBuildId = false
+
+            ext.enableCrashlytics = false
+        }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -35,7 +96,7 @@ android {
 
     lintOptions {
         // Turns off checks for the issue IDs you specify.
-        disable 'TypographyFractions','TypographyQuotes'
+        disable 'TypographyFractions', 'TypographyQuotes'
         // Turns on checks for the issue IDs you specify. These checks are in
         // addition to the default lint checks.
         enable 'RtlHardcoded', 'RtlCompat', 'RtlEnabled'

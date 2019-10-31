@@ -10,6 +10,7 @@ import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +20,10 @@ import androidx.appcompat.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.javafaker.App;
+
 import org.bochman.upapp.dummy.DummyContent;
+import org.bochman.upapp.utils.Debug;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -164,10 +168,18 @@ public class PlacesListActivity extends AppCompatActivity {
         private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener(){
 
             @Override
-            public boolean onLongClick(View v) {
+            public boolean onLongClick(View view) {
+                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+
+                Log.i(Debug.getTag(), "Long Click");
+
                 //TODO: add to favourites by sending the parceled place extra to favourites activity
-                //Intent intent = Intent();
-                return false;
+                Context context = view.getContext();
+                Intent intent = new Intent(context, FavouritesActivity.class);
+                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+
+                context.startActivity(intent);
+                return true;
             }
         };
 
