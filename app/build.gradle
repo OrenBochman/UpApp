@@ -176,7 +176,11 @@ dependencies {
     // Fake data
     implementation 'com.github.DiUS:java-faker:PR443-SNAPSHOT'
 
+    // Parceler
+    implementation 'org.parceler:parceler-api:1.1.12'
+    annotationProcessor 'org.parceler:parceler:1.1.12'
 
+    // Multidex
     implementation 'androidx.multidex:multidex:2.0.1'
 
 }

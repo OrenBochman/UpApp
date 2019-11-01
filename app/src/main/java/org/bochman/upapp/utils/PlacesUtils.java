@@ -47,9 +47,6 @@ public class PlacesUtils {
         // Create a new Places client instance.
         placesClient = Places.createClient(ctx);
 
-
-
-
     }
     private static PlacesUtils inst =null;
 
@@ -58,9 +55,6 @@ public class PlacesUtils {
                inst=new PlacesUtils(ctx);
            return inst;
     }
-
-
-
 
     /**
      * auto complete a query
@@ -109,9 +103,10 @@ public class PlacesUtils {
      * TODO: figure out how to set the language to english
      * @return
      */
-   public List<Poi> fetchCurrentPlaces(){
+   public List<Poi> fetchCurrentPlaces(List<Poi> currentPlaces){
+       Log.i(Debug.getTag(), "entry");
 
-        List<Poi> currentPlaces= new ArrayList<>();
+        //List<Poi> currentPlaces= new ArrayList<>();
 
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(
@@ -130,17 +125,19 @@ public class PlacesUtils {
        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
            placesClient.findCurrentPlace(request).addOnSuccessListener(((response) -> {
                for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                    Poi poi = new Poi(
-                            placeLikelihood.getPlace().getId(),
-                            placeLikelihood.getPlace().getName(),
-                            placeLikelihood.getPlace().getAddress(),
-                            placeLikelihood.getPlace().getLatLng() );
+                   currentPlaces.add(
+                           new Poi(
+                               placeLikelihood.getPlace().getId(),
+                               placeLikelihood.getPlace().getName(),
+                               placeLikelihood.getPlace().getAddress(),
+                               placeLikelihood.getPlace().getLatLng().latitude,
+                               placeLikelihood.getPlace().getLatLng().longitude
+                           )
+                   );
                    Log.i(Debug.getTag(), String.format("Place '%s' \t has likelihood: %f  - %s ",
                            StringUtils.rightPad(placeLikelihood.getPlace().getName(),26),
                            placeLikelihood.getLikelihood(),
                            placeLikelihood.getPlace().getLatLng() ));
-                   currentPlaces.add(poi);
-
                }
            })).addOnFailureListener((exception) -> {
                if (exception instanceof ApiException) {
@@ -150,6 +147,8 @@ public class PlacesUtils {
                    Log.e(Debug.getTag(), "Error: " + exception.toString());
                }
            });
+
+       Log.e(Debug.getTag(), "currentPlaces size: " + currentPlaces.size());
 
        return currentPlaces;
 

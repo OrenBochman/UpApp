@@ -1,4 +1,4 @@
-package org.bochman.upapp;
+package org.bochman.upapp.MasterDetail;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -12,31 +12,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.bochman.upapp.dummy.DummyContent;
+import org.bochman.upapp.R;
+import org.bochman.upapp.utils.Poi;
+import org.parceler.Parcels;
 
 /**
  * A fragment representing a single Item detail screen.
- * This fragment is either contained in a {@link PlacesListActivity}
- * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
+ * This fragment is either contained in a {@link POIListActivity}
+ * in two-pane mode (on tablets) or a {@link POIDetailActivity}
  * on handsets.
  */
-public class ItemDetailFragment extends Fragment {
+public class POIDetailFragment extends Fragment {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
 
+
     /**
      * The dummy content this fragment is presenting.
      */
-    private DummyContent.DummyItem mItem;
+    private Poi mItem;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemDetailFragment() {
+    public POIDetailFragment() {
     }
 
     @Override
@@ -47,12 +50,11 @@ public class ItemDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
-
+            mItem =  Parcels.unwrap(getArguments().getParcelable(ARG_ITEM_ID));
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.content);
+                appBarLayout.setTitle(mItem.name);
             }
         }
     }
@@ -64,7 +66,7 @@ public class ItemDetailFragment extends Fragment {
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.item_detail)).setText(mItem.details);
+            ((TextView) rootView.findViewById(R.id.item_detail)).setText(mItem.address);
         }
 
         return rootView;

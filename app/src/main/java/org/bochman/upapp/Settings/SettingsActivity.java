@@ -1,10 +1,12 @@
-package org.bochman.upapp;
+package org.bochman.upapp.Settings;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
+
+import org.bochman.upapp.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

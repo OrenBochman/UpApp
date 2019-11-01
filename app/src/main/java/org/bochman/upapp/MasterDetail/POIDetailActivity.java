@@ -1,4 +1,4 @@
-package org.bochman.upapp;
+package org.bochman.upapp.MasterDetail;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,13 +11,15 @@ import androidx.core.app.NavUtils;
 
 import android.view.MenuItem;
 
+import org.bochman.upapp.R;
+
 /**
  * An activity representing a single Item detail screen. This
  * activity is only used on narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link PlacesListActivity}.
+ * in a {@link POIListActivity}.
  */
-public class ItemDetailActivity extends AppCompatActivity {
+public class POIDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +47,9 @@ public class ItemDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(ItemDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID));
-            ItemDetailFragment fragment = new ItemDetailFragment();
+            arguments.putParcelable(POIDetailFragment.ARG_ITEM_ID,
+                    getIntent().getParcelableExtra(POIDetailFragment.ARG_ITEM_ID));
+            POIDetailFragment fragment = new POIDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.item_detail_container, fragment)
@@ -74,7 +76,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpTo(this, new Intent(this, PlacesListActivity.class));
+            NavUtils.navigateUpTo(this, new Intent(this, POIListActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
