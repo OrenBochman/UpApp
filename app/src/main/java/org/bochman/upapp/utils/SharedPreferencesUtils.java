@@ -2,8 +2,6 @@ package org.bochman.upapp.utils;
 
 import android.content.Context;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.LinkedList;
 import java.util.List;
 

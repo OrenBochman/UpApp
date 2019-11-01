@@ -28,4 +28,6 @@
     <string name="permission_required_toast">Location permission is required for this App.</string>
     <string name="share">share</string>
     <string name="location_photo_description">photo</string>
+    <string name="near_by">Near By</string>
+    <string name="destination">Destination</string>
 </resources>

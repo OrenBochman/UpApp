@@ -1,7 +1,6 @@
 package org.bochman.upapp.utils;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
@@ -13,7 +12,6 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -21,13 +19,8 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import org.apache.commons.lang3.StringUtils;
 import org.bochman.upapp.BuildConfig;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import androidx.core.content.ContextCompat;
-
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
  * Helper class to handle the Google Places API v2 boiler plate and keep the activities slimmer.

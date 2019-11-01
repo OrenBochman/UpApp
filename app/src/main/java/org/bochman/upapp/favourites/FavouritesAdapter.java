@@ -1,4 +1,4 @@
-package org.bochman.upapp.Favourites;
+package org.bochman.upapp.favourites;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +11,6 @@ import org.bochman.upapp.utils.Poi;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Random;
 
 public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesViewHolder> {
 
@@ -31,7 +30,7 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesViewHolder
     @Override
     public FavouritesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.favourite_list_content, parent, false);
+                .inflate(R.layout.vholder_favourite_item, parent, false);
         return new FavouritesViewHolder(view);
     }
 
@@ -53,10 +52,8 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesViewHolder
 
     }
 
-    private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            Poi item = (Poi) view.getTag();
+    private final View.OnClickListener mOnClickListener = view -> {
+        Poi item = (Poi) view.getTag();
 //                if (mTwoPane) {
 //                    Bundle arguments = new Bundle();
 //                    arguments.putString(POIDetailFragment.POI_KEY, item.id);
@@ -72,7 +69,6 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesViewHolder
 //
 //                    context.startActivity(intent);
 //                }
-        }
     };
 
 

@@ -1,4 +1,4 @@
-package org.bochman.upapp.Favourites;
+package org.bochman.upapp.favourites;
 
 import android.view.View;
 import android.widget.Button;

@@ -1,4 +1,4 @@
-package org.bochman.upapp.MasterDetail;
+package org.bochman.upapp.masterDetail;
 
 import android.view.View;
 import android.widget.ImageView;

@@ -1,6 +1,5 @@
-package org.bochman.upapp.Favourites;
+package org.bochman.upapp.favourites;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
@@ -12,10 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import org.bochman.upapp.MasterDetail.POIDetailFragment;
-import org.bochman.upapp.MasterDetail.POIListActivity;
+import org.bochman.upapp.masterDetail.POIMasterActivity;
 import org.bochman.upapp.R;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.Poi;
@@ -77,8 +74,8 @@ public class FavouritesActivity extends AppCompatActivity {
      *
      * Navigate back to parent activity.
      *
-     * @param item
-     * @return
+     * @param item - the menu item being accessed
+     * @return if handled
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -91,7 +88,7 @@ public class FavouritesActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpTo(this, new Intent(this, POIListActivity.class));
+            NavUtils.navigateUpTo(this, new Intent(this, POIMasterActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

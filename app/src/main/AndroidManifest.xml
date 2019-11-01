@@ -40,7 +40,7 @@
             android:name=".Settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".MasterDetail.POIListActivity"
+            android:name=".masterDetail.POIMasterActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -49,22 +49,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MasterDetail.POIDetailActivity"
+            android:name=".masterDetail.POIDetailActivity"
             android:label="@string/title_item_detail"
-            android:parentActivityName=".MasterDetail.POIListActivity"
+            android:parentActivityName=".masterDetail.POIMasterActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:targetApi="jelly_bean">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bochman.upapp.MasterDetail.POIListActivity" />
+                android:value="org.bochman.upapp.masterDetail.POIMasterActivity" />
         </activity>
-        <activity android:name=".Favourites.FavouritesActivity"
-            android:parentActivityName=".MasterDetail.POIListActivity"
+        <activity android:name=".favourites.FavouritesActivity"
+            android:parentActivityName=".masterDetail.POIMasterActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:targetApi="jelly_bean">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bochman.upapp.MasterDetail.POIListActivity" />
+                android:value="org.bochman.upapp.masterDetail.POIMasterActivity" />
         </activity>
     </application>
 

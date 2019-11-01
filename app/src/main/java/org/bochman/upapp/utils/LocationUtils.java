@@ -3,7 +3,6 @@ package org.bochman.upapp.utils;
 import android.content.Context;
 import android.location.Location;
 import android.os.Looper;
-import android.widget.Toast;
 
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -13,8 +12,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.RectangularBounds;
-
-import java.util.Dictionary;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 

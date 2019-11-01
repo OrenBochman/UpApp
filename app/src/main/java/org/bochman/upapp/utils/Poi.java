@@ -1,11 +1,7 @@
 package org.bochman.upapp.utils;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
-
-import java.util.Objects;
 
 /**
  * Place of Interst pojo

@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.bochman.upapp.Favourites.FavouritesActivity">
+    tools:context="org.bochman.upapp.favourites.FavouritesActivity">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -37,6 +37,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/favouritesToolbar"
         app:layout_constraintVertical_bias="1.0"
-        tools:listitem="@layout/favourite_list_content" />
+        tools:listitem="@layout/vholder_favourite_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

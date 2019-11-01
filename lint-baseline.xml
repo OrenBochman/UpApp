@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.0 Canary 1">
+
+    <issue
+        id="InconsistentLayout"
+        message="The id &quot;item_detail_container&quot; in layout &quot;item_list&quot; is missing from the following layout configurations: layout (present in layout-w900dp)">
+        <location
+            file="src/main/res/layout-w900dp/item_list.xml"
+            line="33"/>
+    </issue>
+
+    <issue
+        id="InnerclassSeparator"
+        message="Use &apos;$&apos; instead of &apos;.&apos; for inner classes (or use only lowercase letters in package names); replace &quot;.Settings.SettingsActivity&quot; with &quot;.Settings$SettingsActivity&quot;">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="40"/>
+    </issue>
+
+    <issue
+        id="AnnotationProcessorOnCompilePath"
+        message="Add annotation processor to processor path using `annotationProcessor` instead of `implementation`">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.fab_margin` appears to be unused">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="3"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.menu.favourites_list_activity_menu` appears to be unused">
+        <location
+            file="src/main/res/menu/favourites_list_activity_menu.xml"
+            line="2"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_settings_black_24dp` appears to be unused">
+        <location
+            file="src/main/res/drawable/ic_settings_black_24dp.xml"
+            line="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.title_activity_maps` appears to be unused">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="20"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image">
+        <location
+            file="src/main/res/layout/item_list_content.xml"
+            line="29"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead.">
+        <location
+            file="src/main/java/org/bochman/upapp/favourites/FavouritesAdapter.java"
+            line="41"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead.">
+        <location
+            file="src/main/java/org/bochman/upapp/masterDetail/POIsAdapter.java"
+            line="62"/>
+    </issue>
+
+</issues>

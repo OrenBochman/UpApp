@@ -1,4 +1,4 @@
-package org.bochman.upapp.MasterDetail;
+package org.bochman.upapp.masterDetail;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.bochman.upapp.Favourites.FavouritesActivity;
+import org.bochman.upapp.favourites.FavouritesActivity;
 import org.bochman.upapp.R;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.Poi;
@@ -28,12 +28,12 @@ import java.util.List;
  */
 public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
 
-    private final POIListActivity mParentActivity;
+    private final POIMasterActivity mParentActivity;
     private final List<Poi> mValues;
     //private final List<Poi> mValuesFiltered;
     private final boolean mTwoPane;
 
-    POIsAdapter(POIListActivity parent,
+    POIsAdapter(POIMasterActivity parent,
                 List<Poi> items,
                 boolean twoPane) {
         mValues = items;
@@ -51,7 +51,7 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     @Override
     public POIViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_list_content, parent, false);
+                .inflate(R.layout.vholder_poi_item, parent, false);
         return new POIViewHolder(view);
     }
 
@@ -101,20 +101,16 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     };
 
     // the long click lister
-    private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener(){
+    private final View.OnLongClickListener mOnLongClickListener = view -> {
+        Log.i(Debug.getTag(), "OnLongClick");
+        Poi item = (Poi) view.getTag();
+        //add to favourites by passing the item's id with the intent.
+        Context context = view.getContext();
+        Intent intent = new Intent(context, FavouritesActivity.class);
+        intent.putExtra(FavouritesActivity.POI_KEY, Parcels.wrap(item) );
 
-        @Override
-        public boolean onLongClick(View view) {
-            Log.i(Debug.getTag(), "OnLongClick");
-            Poi item = (Poi) view.getTag();
-            //add to favourites by passing the item's id with the intent.
-            Context context = view.getContext();
-            Intent intent = new Intent(context, FavouritesActivity.class);
-            intent.putExtra(FavouritesActivity.POI_KEY, Parcels.wrap(item) );
-
-            context.startActivity(intent);
-            return true;
-        }
+        context.startActivity(intent);
+        return true;
     };
 
 } // POIsAdapter :-}8

@@ -1,4 +1,4 @@
-package org.bochman.upapp.MasterDetail;
+package org.bochman.upapp.masterDetail;
 
 import android.Manifest;
 import android.content.Context;
@@ -47,7 +47,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class POIListActivity extends AppCompatActivity {
+public class POIMasterActivity extends AppCompatActivity {
 
     /** the list of places of interest */
     private final List<Poi> placesList = new ArrayList<>();
@@ -88,7 +88,7 @@ public class POIListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_list);
+        setContentView(R.layout.activity_poi_master);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -170,19 +170,16 @@ public class POIListActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
-        switch (requestCode) {
-            case LOCATION_PERMISSION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (permissions.length == 1 &&
-                        permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        placesUtils.fetchCurrentPlaces(placesList);
-                } else {
-                    Log.e(Debug.getTag(),"permissions.length="+permissions.length);
-                    Log.e(Debug.getTag(),"permissions[0]="+permissions[0]);
-                    Log.e(Debug.getTag(),"grantResults[0]="+ PackageManager.PERMISSION_GRANTED);
-                    Toast.makeText(this,"Permission Denied",Toast.LENGTH_LONG).show();
-                }
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {// If request is cancelled, the result arrays are empty.
+            if (permissions.length == 1 &&
+                    permissions[0].equals(ACCESS_FINE_LOCATION) &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                placesUtils.fetchCurrentPlaces(placesList);
+            } else {
+                Log.e(Debug.getTag(), "permissions.length=" + permissions.length);
+                Log.e(Debug.getTag(), "permissions[0]=" + permissions[0]);
+                Log.e(Debug.getTag(), "grantResults[0]=" + PackageManager.PERMISSION_GRANTED);
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_LONG).show();
             }
         }
     }

@@ -20,7 +20,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
 
         // Making either of these two values dynamic in the defaultConfig will
         // require a full APK build and reinstallation because the AndroidManifest.xml
@@ -29,13 +28,12 @@ android {
         versionName "1.0"
         resConfigs "en"
 
+        multiDexEnabled true
     }
-
 
     buildTypes {
 
         release {
-
 
             buildConfigField "String", "google_maps_key", getProps("myApiKey")
             resValue 'string', "google_maps_key", getProps("myApiKeyUnquoted")
@@ -45,10 +43,8 @@ android {
             //buildConfigField("String", "BUILD_TIME", "\"${minutesSinceEpoch}\"")
             //resValue("string", "build_time", "${minutesSinceEpoch}")
 
-
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
 
         }
 
@@ -62,7 +58,6 @@ android {
 
             buildConfigField "String", "google_maps_key", getProps("myApiKey")
             resValue 'string', "google_maps_key", getProps("myApiKeyUnquoted")
-
 
             // To avoid using legacy multidex when building from the command line,
             // set minSdkVersion to 21 or higher. When using Android Studio 2.3 or higher,
@@ -78,15 +73,15 @@ android {
 
             // Disables PNG crunching for the release build type.
             crunchPngs false
-            ext.alwaysUpdateBuildId = false
-
             ext.enableCrashlytics = false
         }
 
     }
     compileOptions {
+       //coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        // Flag to enable support for the new language APIs
     }
 
     packagingOptions {
@@ -94,6 +89,8 @@ android {
     }
 
     lintOptions {
+        baseline "lint-baseline.xml"
+        enable 'SyntacticAccessor'
         // Turns off checks for the issue IDs you specify.
         disable 'TypographyFractions', 'TypographyQuotes'
         // Turns on checks for the issue IDs you specify. These checks are in
@@ -104,11 +101,13 @@ android {
         // any issue IDs you enable or disable using the properties above.
         check 'NewApi', 'InlinedApi'
         // If set to true, turns off analysis progress reporting by lint.
-        quiet true
+        quiet = true
         // if set to true (default), stops the build if errors are found.
-        abortOnError false
+        abortOnError = false
         // if true, only report errors.
-        ignoreWarnings true
+        ignoreWarnings = true
+        htmlReport = true
+        textReport=false
     }
 }
 
@@ -119,15 +118,9 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.preference:preference:1.1.0'
-
     implementation 'com.google.android.material:material:1.0.0'
-
-
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
-
     implementation 'com.google.android.libraries.places:places:2.0.0'
-
-
 
     // Third party libs
 

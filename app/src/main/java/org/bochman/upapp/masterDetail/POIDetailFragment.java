@@ -1,4 +1,4 @@
-package org.bochman.upapp.MasterDetail;
+package org.bochman.upapp.masterDetail;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -18,7 +18,7 @@ import org.parceler.Parcels;
 
 /**
  * A fragment representing a single Item detail screen.
- * This fragment is either contained in a {@link POIListActivity}
+ * This fragment is either contained in a {@link POIMasterActivity}
  * in two-pane mode (on tablets) or a {@link POIDetailActivity}
  * on handsets.
  */

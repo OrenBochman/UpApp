@@ -1,4 +1,4 @@
-package org.bochman.upapp.MasterDetail;
+package org.bochman.upapp.masterDetail;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,14 +17,14 @@ import org.bochman.upapp.R;
  * An activity representing a single Item detail screen. This
  * activity is only used on narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link POIListActivity}.
+ * in a {@link POIMasterActivity}.
  */
 public class POIDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_detail);
+        setContentView(R.layout.activity_poi_detail);
         Toolbar toolbar =  findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
@@ -76,7 +76,7 @@ public class POIDetailActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpTo(this, new Intent(this, POIListActivity.class));
+            NavUtils.navigateUpTo(this, new Intent(this, POIMasterActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
