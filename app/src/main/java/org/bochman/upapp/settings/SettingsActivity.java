@@ -1,4 +1,4 @@
-package org.bochman.upapp.Settings;
+package org.bochman.upapp.settings;
 
 import android.os.Bundle;
 

@@ -43,7 +43,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="100"
-                android:autoText="false"
                 android:ems="10"
                 android:gravity="fill_horizontal"
                 android:hint="@string/query"

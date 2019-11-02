@@ -1,6 +1,7 @@
 package org.bochman.upapp.wifi;
 
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +17,7 @@ public class ConnectivityWatcher extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //here, check that the network connection is available. If yes, start your service. If not, stop your service.
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
+        @SuppressLint("MissingPermission") NetworkInfo info = cm.getActiveNetworkInfo();
         if (info != null && info.getType() == ConnectivityManager.TYPE_WIFI && info.isConnected()) {
 
                 //notify wifi is on
