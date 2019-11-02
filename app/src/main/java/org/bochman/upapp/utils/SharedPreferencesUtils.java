@@ -7,27 +7,57 @@ import java.util.List;
 
 public class SharedPreferencesUtils {
 
-    public static String getLastSearch(Context ctx){
+    static final String LAT = "lat";
+    static final String LON = "lon";
+    static final String QUERY = "History";
+
+
+    public static void setFloat(Double x, String key, Context ctx) {
+        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putFloat(key, x.floatValue());
+        editor.apply();
+    }
+
+    public static void setString(String x, String key, Context ctx) {
+        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(key, x);
+        editor.apply();
+    }
+
+
+    public static String getLastSearch(Context ctx) {
         android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
 
         List<Object> pair = new LinkedList<>();
-        String query= sharedPreferences.getString("query", "");
-        //float latitude = sharedPreferences.getFloat("latitude", 0.0f);
-        //float longitude= sharedPreferences.getFloat("longitude", 0.0f);
-        //LatLng location = new LatLng(latitude,longitude);
-        //pair.add(query);
-        //pair.add(location);
+        String query = sharedPreferences.getString("query", "");
         return query;
     }
 
     public static void setLastSearch(String query, //LatLng location,
-                              Context ctx){
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
-
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("query", query);
-        //editor.putFloat("latitude", (float) location.latitude);
-        //editor.putFloat("longitude",(float) location.longitude);
-        editor.apply();
+                                     Context ctx) {
+        setString(query,QUERY,ctx);
     }
+
+    public static double getLat(Context ctx) {
+        return ctx.getSharedPreferences("lat", Context.MODE_PRIVATE).
+                getFloat("lat", 32.0668f);
+    }
+
+    public static void setLat(Double lat, Context ctx) {
+        setFloat(lat, LAT, ctx);
+    }
+
+
+    public static double getLng(Context ctx) {
+        return ctx.getSharedPreferences("lat", Context.MODE_PRIVATE).
+                getFloat("lat", 34.8149f);
+    }
+
+    public static void setLon(Double lat, Context ctx) {
+        setFloat(lat, LON, ctx);
+    }
+
+
 }

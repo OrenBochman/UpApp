@@ -1,6 +1,8 @@
 package org.bochman.upapp.utils;
 
+import android.app.Application;
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
@@ -18,14 +20,17 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bochman.upapp.BuildConfig;
+import org.bochman.upapp.UpApp;
+import org.bochman.upapp.data.enteties.Poi;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper class to handle the Google Places API v2 boiler plate and keep the activities slimmer.
- *
- * Can be initilized in the App, The ViewModel or MainActivity.
+ * <p>
+ * Can be initialized in the App, The ViewModel or MainActivity.
  */
 public class PlacesUtils {
     /**
@@ -41,20 +46,22 @@ public class PlacesUtils {
         placesClient = Places.createClient(ctx);
 
     }
-    private static PlacesUtils inst =null;
 
-    public static PlacesUtils getInstance(Context ctx){
-           if(inst==null)
-               inst=new PlacesUtils(ctx);
-           return inst;
+    private static PlacesUtils inst = null;
+
+    public static PlacesUtils getInstance(Context ctx) {
+        if (inst == null)
+            inst = new PlacesUtils(ctx);
+        return inst;
     }
 
     /**
      * auto complete a query
      * // TODO: needs to move to a util class + unit tests
+     *
      * @param query - text to autocomplete.
      */
-   public  void autocompleteQuery(String query){
+    public void autocompleteQuery(String query) {
         // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
         // and once again when the user makes a selection (for example when calling fetchPlace()).
         AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
@@ -94,10 +101,11 @@ public class PlacesUtils {
 
     /**
      * TODO: figure out how to set the language to english
+     *
      * @return
      */
-   public List<Poi> fetchCurrentPlaces(List<Poi> currentPlaces){
-       Log.i(Debug.getTag(), "entry");
+    public List<Poi> fetchCurrentPlaces(List<Poi> currentPlaces) {
+        Log.i(Debug.getTag(), "entry");
 
         //List<Poi> currentPlaces= new ArrayList<>();
 
@@ -107,43 +115,57 @@ public class PlacesUtils {
                 Place.Field.NAME,
                 Place.Field.ADDRESS,
                 Place.Field.LAT_LNG,
-                Place.Field.PHOTO_METADATAS);
+                Place.Field.PHOTO_METADATAS,
+                Place.Field.PHONE_NUMBER,
+                Place.Field.WEBSITE_URI,
+                Place.Field.RATING);
 
         // Construct a request object, passing the place ID and fields array.
         //FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields).build();
 
-        FindCurrentPlaceRequest request = FindCurrentPlaceRequest.builder( placeFields).build();
+        FindCurrentPlaceRequest request = FindCurrentPlaceRequest.builder(placeFields).build();
 
 
-       // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-           placesClient.findCurrentPlace(request).addOnSuccessListener(((response) -> {
-               for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                   currentPlaces.add(
-                           new Poi(
-                               placeLikelihood.getPlace().getId(),
-                               placeLikelihood.getPlace().getName(),
-                               placeLikelihood.getPlace().getAddress(),
-                               placeLikelihood.getPlace().getLatLng().latitude,
-                               placeLikelihood.getPlace().getLatLng().longitude
-                           )
-                   );
-                   Log.i(Debug.getTag(), String.format("Place '%s' \t has likelihood: %f  - %s ",
-                           StringUtils.rightPad(placeLikelihood.getPlace().getName(),26),
-                           placeLikelihood.getLikelihood(),
-                           placeLikelihood.getPlace().getLatLng() ));
-               }
-           })).addOnFailureListener((exception) -> {
-               if (exception instanceof ApiException) {
-                   ApiException apiException = (ApiException) exception;
-                   Log.e(Debug.getTag(), "Place not found: " + apiException.getStatusCode());
-               }else{
-                   Log.e(Debug.getTag(), "Error: " + exception.toString());
-               }
-           });
+        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+        placesClient.findCurrentPlace(request).addOnSuccessListener(((response) -> {
+            for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
 
-       Log.e(Debug.getTag(), "currentPlaces size: " + currentPlaces.size());
+                // handling nullable types in the response
+                Optional<LatLng> optionalLatLng = Optional.ofNullable(placeLikelihood.getPlace().getLatLng());
+                Optional<Double> optionalRating = Optional.ofNullable(placeLikelihood.getPlace().getRating());
+                Optional<Uri> optionalWeb = Optional.ofNullable(placeLikelihood.getPlace().getWebsiteUri());
 
-       return currentPlaces;
+                Poi poi= new Poi(
+                                placeLikelihood.getPlace().getId(),
+                                placeLikelihood.getPlace().getName(),
+                                optionalLatLng.map(x -> x.latitude).orElse(0.0),
+                                optionalLatLng.map(x -> x.longitude).orElse(0.0),
+                                placeLikelihood.getPlace().getAddress(),
+                                placeLikelihood.getPlace().getPhoneNumber(),
+                                optionalWeb.map(x->x.toString()).orElse(""),
+                                optionalRating.orElse(0.0));
+
+                currentPlaces.add(poi);
+
+                //UpApp.getPoiDatabase();
+
+                Log.i(Debug.getTag(), String.format("Place '%s' \t has likelihood: %f  - %s ",
+                        StringUtils.rightPad(placeLikelihood.getPlace().getName(), 26),
+                        placeLikelihood.getLikelihood(),
+                        placeLikelihood.getPlace().getLatLng()));
+            }
+        })).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e(Debug.getTag(), "Place not found: " + apiException.getStatusCode());
+            } else {
+                Log.e(Debug.getTag(), "Error: " + exception.toString());
+            }
+        });
+
+        Log.e(Debug.getTag(), "currentPlaces size: " + currentPlaces.size());
+
+        return currentPlaces;
 
     }
 

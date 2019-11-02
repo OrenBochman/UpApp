@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.bochman.upapp.favourites.FavouritesActivity;
 import org.bochman.upapp.R;
 import org.bochman.upapp.utils.Debug;
-import org.bochman.upapp.utils.Poi;
+import org.bochman.upapp.data.enteties.Poi;
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 

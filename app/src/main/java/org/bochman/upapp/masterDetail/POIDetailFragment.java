@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.bochman.upapp.R;
-import org.bochman.upapp.utils.Poi;
+import org.bochman.upapp.data.enteties.Poi;
 import org.parceler.Parcels;
 
 /**

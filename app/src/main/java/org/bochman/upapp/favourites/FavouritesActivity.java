@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import org.bochman.upapp.masterDetail.POIMasterActivity;
 import org.bochman.upapp.R;
 import org.bochman.upapp.utils.Debug;
-import org.bochman.upapp.utils.Poi;
+import org.bochman.upapp.data.enteties.Poi;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;

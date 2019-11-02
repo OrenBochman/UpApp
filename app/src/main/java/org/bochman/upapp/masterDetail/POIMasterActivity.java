@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -22,8 +21,7 @@ import org.bochman.upapp.R;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
-import org.bochman.upapp.utils.Poi;
-import org.bochman.upapp.utils.SharedPreferencesUtils;
+import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.wifi.ConnectivityWatcher;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +35,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -110,7 +107,7 @@ public class POIMasterActivity extends AppCompatActivity {
         toolbar.setTitle(getTitle());
 
 
-        placesList.add(new Poi("123", "Name", "Address", 0.0, 0.0));
+        placesList.add(new Poi("123", "Name",  0.0, 0.0,"Address","0544320000","http://goggle.com",4.0f));
         String query = getLastSearch(this);
         queryText = findViewById(R.id.editTextQuery);
         searchButton = findViewById(R.id.buttonSearch);
