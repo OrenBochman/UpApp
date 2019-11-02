@@ -38,19 +38,21 @@
                 android:text="@string/near_by" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName"
+                android:id="@+id/editTextQuery"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="100"
-                android:autofillHints=""
+                android:autoText="false"
                 android:ems="10"
                 android:gravity="fill_horizontal"
-                android:hint="@string/destination"
-                android:inputType="textAutoComplete" />
+                android:hint="@string/query"
+                android:inputType="textAutoComplete"
+                android:autofillHints="AUTOFILL_HINT_POSTAL_ADDRESS"
+                android:importantForAutofill="yes"/>
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/buttonSearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="end"

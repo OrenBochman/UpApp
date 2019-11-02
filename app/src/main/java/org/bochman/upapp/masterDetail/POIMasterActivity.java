@@ -5,22 +5,13 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuItemCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import androidx.appcompat.widget.SearchView;
-
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,7 +28,17 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static org.bochman.upapp.utils.SharedPreferencesUtils.*;
 
 /**
  * An activity representing a list of Places. This activity
@@ -49,16 +50,21 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  */
 public class POIMasterActivity extends AppCompatActivity {
 
-    /** the list of places of interest */
+    /**
+     * the list of places of interest
+     */
     private final List<Poi> placesList = new ArrayList<>();
-
-    // the places adapter
-    POIsAdapter adapter;
-
+    POIsAdapter adapter;                    // the places adapter
     private Location lastKnownLocation;
+
+    Button searchButton;
+    Button nearbyButton;
+    EditText queryText;
+
 
     /**
      * Request code for location permission request.
+     *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     final static int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -69,15 +75,21 @@ public class POIMasterActivity extends AppCompatActivity {
      */
     private boolean mPermissionDenied = false;
 
-    /** Whether or not the activity is in two-pane mode, i.e. running on a tablet device. */
+    /**
+     * Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
+     */
     private boolean mTwoPane;
 
-    /**  Places singleton */
+    /**
+     * Places singleton
+     */
     private PlacesUtils placesUtils;
 
     Context myContext;
 
-    /** The FusedLocation client. */
+    /**
+     * The FusedLocation client.
+     */
     private FusedLocationProviderClient fusedLocationClient;
 
     /**
@@ -95,11 +107,17 @@ public class POIMasterActivity extends AppCompatActivity {
         toolbar.setTitle(getTitle());
 
 
-        placesList.add(new Poi("123","Name","Address",0.0,0.0));
-        String query= SharedPreferencesUtils.getLastSearch(this);
-        // TODO set the value of the search widget
+        placesList.add(new Poi("123", "Name", "Address", 0.0, 0.0));
+        String query = getLastSearch(this);
+        searchButton = findViewById(R.id.buttonSearch);
+        nearbyButton = findViewById(R.id.buttonNearBy);
+        queryText = findViewById(R.id.editTextQuery);
+
+        // Feature: restoring saved search.
+        queryText.setText(query);
+
         SearchView searchView = findViewById(R.id.action_search);
-       // searchView.setQuery(query,true);
+        // searchView.setQuery(query,true);
         PoiSearch(query);
 
         LocationUtils locationutils = new LocationUtils(getApplicationContext());
@@ -111,7 +129,7 @@ public class POIMasterActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-        myContext=this;
+        myContext = this;
 
         // Initialize FusedLocation APIs
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -122,34 +140,67 @@ public class POIMasterActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        adapter= new POIsAdapter(this, placesList, mTwoPane);
+        adapter = new POIsAdapter(this, placesList, mTwoPane);
         recyclerView.setAdapter(adapter);
     }
 
     /**
      * todo figure out how to incorporate query in search.
+     *
      * @param query
      */
-    void PoiSearch(String query){
+    void PoiSearch(String query) {
         // get places nearby
-        placesUtils=PlacesUtils.getInstance(getApplicationContext());
+        placesUtils = PlacesUtils.getInstance(getApplicationContext());
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-             placesUtils.fetchCurrentPlaces(placesList);
+            placesUtils.fetchCurrentPlaces(placesList);
 
-        }    else {
+        } else {
             getLocationPermission();
-            Toast.makeText(this,"Permission Issue in PoiSearch",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Permission Issue in PoiSearch", Toast.LENGTH_LONG).show();
         }
     }
 
-    void getLocationPermission(){
+    /**
+     * resume lifecycle handler
+     * Non-MVP-TODO: test onResume.
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Feature: restoring saved search.
+        this.<EditText>findViewById(R.id.editTextQuery)
+                .setText(getLastSearch(this));
+
+        //TODO: re-run the last search.
+    }
+
+
+
+    /**
+     * pause lifecycle handler
+     * Non-MVP-TODO: test onPAuse.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // Feature: saving last search.
+        setLastSearch(
+                this.<EditText>findViewById(R.id.editTextQuery).getText().toString(),
+                getApplicationContext());
+    }
+
+
+    void getLocationPermission() {
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(Debug.getTag(),"ACCESS_FINE_LOCATION not granted !");
+            Log.e(Debug.getTag(), "ACCESS_FINE_LOCATION not granted !");
             // Permission is not granted
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Log.e(Debug.getTag(),"ACCESS_FINE_LOCATION not granted !");
+                Log.e(Debug.getTag(), "ACCESS_FINE_LOCATION not granted !");
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
@@ -163,7 +214,7 @@ public class POIMasterActivity extends AppCompatActivity {
             }
         } else {
             // Permission has already been granted
-             placesUtils.fetchCurrentPlaces(placesList);
+            placesUtils.fetchCurrentPlaces(placesList);
 
         }
     }
@@ -185,7 +236,7 @@ public class POIMasterActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.places_list_activity_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
@@ -198,16 +249,16 @@ public class POIMasterActivity extends AppCompatActivity {
                     public boolean onQueryTextSubmit(String query) {
                         //text changed apply filtering.
 
-                        if(query.length()==0){
+                        if (query.length() == 0) {
                             //Save search in shared preferences
-                            SharedPreferencesUtils.setLastSearch("",myContext);
+                            setLastSearch("", myContext);
                             // run a search with the current location.
                             PoiSearch("");
                             //Toast.makeText(getApplicationContext(),"todo: local search ",Toast.LENGTH_SHORT).show();
-                        }else{
+                        } else {
 
                             //Save search in shared perferences
-                            SharedPreferencesUtils.setLastSearch(query,myContext);
+                            setLastSearch(query, myContext);
                             // run a search with the current query.
                             PoiSearch(query);
                             //Toast.makeText(getApplicationContext(),"todo: search for "+query,Toast.LENGTH_SHORT).show();
@@ -218,7 +269,7 @@ public class POIMasterActivity extends AppCompatActivity {
                     @Override
                     public boolean onQueryTextChange(String newText) {
                         //perform search.
-                        Toast.makeText(getApplicationContext(),"todo: filter for "+newText,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "todo: filter for " + newText, Toast.LENGTH_SHORT).show();
                         return true;
                     }
                 }
