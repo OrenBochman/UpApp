@@ -2,6 +2,7 @@ package org.bochman.upapp.masterDetail;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
 import org.bochman.upapp.utils.Poi;
 import org.bochman.upapp.utils.SharedPreferencesUtils;
+import org.bochman.upapp.wifi.ConnectivityWatcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -109,9 +112,9 @@ public class POIMasterActivity extends AppCompatActivity {
 
         placesList.add(new Poi("123", "Name", "Address", 0.0, 0.0));
         String query = getLastSearch(this);
+        queryText = findViewById(R.id.editTextQuery);
         searchButton = findViewById(R.id.buttonSearch);
         nearbyButton = findViewById(R.id.buttonNearBy);
-        queryText = findViewById(R.id.editTextQuery);
 
         // Feature: restoring saved search.
         queryText.setText(query);
@@ -145,7 +148,7 @@ public class POIMasterActivity extends AppCompatActivity {
     }
 
     /**
-     * todo figure out how to incorporate query in search.
+     * TODO: figure out how to incorporate query in search.
      *
      * @param query
      */
@@ -170,26 +173,30 @@ public class POIMasterActivity extends AppCompatActivity {
         super.onResume();
 
         // Feature: restoring saved search.
-        this.<EditText>findViewById(R.id.editTextQuery)
-                .setText(getLastSearch(this));
+        queryText.setText(getLastSearch(this));
 
-        //TODO: re-run the last search.
+        //Feature start wifi monitoring service - will not work for api >= 28 pie
+        registerReceiver( connectivityWatcher,new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
 
-
+    /**
+     *
+     */
+    private ConnectivityWatcher connectivityWatcher=new ConnectivityWatcher();
 
     /**
      * pause lifecycle handler
-     * Non-MVP-TODO: test onPAuse.
+     * Non-MVP-TODO: test onPause.
      */
     @Override
     public void onPause() {
         super.onPause();
 
         // Feature: saving last search.
-        setLastSearch(
-                this.<EditText>findViewById(R.id.editTextQuery).getText().toString(),
-                getApplicationContext());
+        setLastSearch(queryText.getText().toString(), getApplicationContext());
+
+        //Feature: suspend wifi monitoring service
+        unregisterReceiver(connectivityWatcher);
     }
 
 

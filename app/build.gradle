@@ -28,8 +28,15 @@ android {
         versionName "1.0"
         resConfigs "en"
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
         multiDexEnabled true
     }
+
 
     buildTypes {
 
@@ -77,12 +84,15 @@ android {
         }
 
     }
+
     compileOptions {
        //coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
         // Flag to enable support for the new language APIs
     }
+
+
 
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
@@ -118,6 +128,11 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.preference:preference:1.1.0'
+
+    // Room for simple persistence with an ORM
+    implementation "androidx.room:room-runtime:2.2.1"
+    annotationProcessor "androidx.room:room-compiler:2.2.1"
+
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.libraries.places:places:2.0.0'
