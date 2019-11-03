@@ -31,5 +31,4 @@ public class CacheUtils {
             cache.flush();
         }
     }
-
 }

@@ -9,7 +9,7 @@ import android.widget.Toast;
 import org.bochman.upapp.BuildConfig;
 import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
-import org.bochman.upapp.utils.SharedPreferencesUtils;
+import org.bochman.upapp.utils.SpUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,8 +49,8 @@ public class HttpPoiSearchIntentService extends IntentService {
         } else {
             Log.i(TAG, "Search for " + keyword);
         }
-        float userLat = (float) SharedPreferencesUtils.getLat(this);
-        float userLng = (float) SharedPreferencesUtils.getLng(this);
+        float userLat = (float) SpUtils.getLat(this);
+        float userLng = (float) SpUtils.getLng(this);
         String radius = "1000";
 
         OkHttpClient client = new OkHttpClient();

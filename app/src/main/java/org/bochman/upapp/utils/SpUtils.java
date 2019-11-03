@@ -5,21 +5,20 @@ import android.content.Context;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SharedPreferencesUtils {
+public class SpUtils {
 
     static final String LAT = "lat";
-    static final String LON = "lon";
+    static final String LNG = "lng";
     static final String QUERY = "History";
 
-
-    public static void setFloat(Double x, String key, Context ctx) {
+    static void setFloat(Double x, String key, Context ctx) {
         android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putFloat(key, x.floatValue());
         editor.apply();
     }
 
-    public static void setString(String x, String key, Context ctx) {
+    static void setString(String x, String key, Context ctx) {
         android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, x);
@@ -55,8 +54,8 @@ public class SharedPreferencesUtils {
                 getFloat("lat", 34.8149f);
     }
 
-    public static void setLon(Double lat, Context ctx) {
-        setFloat(lat, LON, ctx);
+    public static void setLng(Double lat, Context ctx) {
+        setFloat(lat, LNG, ctx);
     }
 
 

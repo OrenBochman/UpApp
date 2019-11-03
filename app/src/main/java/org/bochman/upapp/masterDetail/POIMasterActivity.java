@@ -2,10 +2,12 @@ package org.bochman.upapp.masterDetail;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,14 +16,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
 
 import org.bochman.upapp.R;
+import org.bochman.upapp.api.PoiIntentService;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
 import org.bochman.upapp.data.enteties.Poi;
+import org.bochman.upapp.utils.SpUtils;
 import org.bochman.upapp.wifi.ConnectivityWatcher;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +46,8 @@ import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static org.bochman.upapp.utils.SharedPreferencesUtils.*;
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+import static org.bochman.upapp.utils.SpUtils.*;
 
 /**
  * An activity representing a list of Places. This activity
@@ -55,7 +64,6 @@ public class POIMasterActivity extends AppCompatActivity {
      */
     private final List<Poi> placesList = new ArrayList<>();
     POIsAdapter adapter;                    // the places adapter
-    private Location lastKnownLocation;
 
     Button searchButton;
     Button nearbyButton;
@@ -87,10 +95,6 @@ public class POIMasterActivity extends AppCompatActivity {
 
     Context myContext;
 
-    /**
-     * The FusedLocation client.
-     */
-    private FusedLocationProviderClient fusedLocationClient;
 
     /**
      * Activity entry point.
@@ -105,8 +109,7 @@ public class POIMasterActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-
-
+        startLocationUpdates();
         placesList.add(new Poi("123", "Name",  0.0, 0.0,"Address","0544320000","http://goggle.com",4.0f));
         String query = getLastSearch(this);
         queryText = findViewById(R.id.editTextQuery);
@@ -115,7 +118,13 @@ public class POIMasterActivity extends AppCompatActivity {
 
         // Feature: restoring saved search.
         queryText.setText(query);
+        searchButton.setOnClickListener(v -> {
 
+            //Do the search
+            Intent intent = new Intent(this, PoiIntentService.class);
+            intent.putExtra(PoiIntentService.QUERY, queryText.getText());
+            startService(intent);
+        });
         SearchView searchView = findViewById(R.id.action_search);
         // searchView.setQuery(query,true);
         PoiSearch(query);
@@ -131,8 +140,6 @@ public class POIMasterActivity extends AppCompatActivity {
         }
         myContext = this;
 
-        // Initialize FusedLocation APIs
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
@@ -142,6 +149,54 @@ public class POIMasterActivity extends AppCompatActivity {
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         adapter = new POIsAdapter(this, placesList, mTwoPane);
         recyclerView.setAdapter(adapter);
+    }
+
+
+    // Trigger new location updates at interval
+    protected void startLocationUpdates() {
+        long UPDATE_INTERVAL = 10 * 1000;  // 10 secs - put into shared preferences
+        long FASTEST_INTERVAL = 2000;      // 2 sec  shared preferences
+
+        LocationRequest mLocationRequest;
+
+        // Create the location request to start receiving updates
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        // Create LocationSettingsRequest object using location request
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        // Check whether location settings are satisfied
+        // https://developers.google.com/android/reference/com/google/android/gms/location/SettingsClient
+        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+
+        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
+        getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        // do work here
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                },
+                Looper.myLooper());
+    }
+
+    public void onLocationChanged(Location location) {
+        //store in SharedPreferences for all to use with distance calculations.
+        SpUtils.setLat(location.getLatitude(),this);
+        SpUtils.setLng(location.getLongitude(),this);
+
+        // New location has now been determined
+        StringBuilder msg = new StringBuilder()
+                .append("Updated Location: ")
+                .append(location.getLatitude())
+                .append(",").append(location.getLongitude());
+        Log.i(Debug.getTag(),msg.toString());
     }
 
     /**

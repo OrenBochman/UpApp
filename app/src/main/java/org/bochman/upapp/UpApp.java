@@ -2,6 +2,8 @@ package org.bochman.upapp;
 
 import android.app.Application;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
@@ -13,6 +15,10 @@ import androidx.room.Room;
 public class UpApp extends Application {
 
     private static final String TAG = UpApp.class.getSimpleName();
+    /**
+     * The FusedLocation client.
+     */
+    private FusedLocationProviderClient fusedLocationClient;
 
     PoiDatabase poiDatabase;
     PlacesClient placesClient;
@@ -20,6 +26,10 @@ public class UpApp extends Application {
     public void onCreate() {
         super.onCreate();
         CacheUtils.initializeCache(this);
+
+
+        // Initialize FusedLocation APIs
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //init DB  - when upgrading versions, kill the original tables by using fallbackToDestructiveMigration()
         poiDatabase = Room.databaseBuilder(this, PoiDatabase.class, PoiDatabase.NAME).fallbackToDestructiveMigration().build();

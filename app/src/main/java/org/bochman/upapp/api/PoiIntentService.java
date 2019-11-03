@@ -17,7 +17,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import org.bochman.upapp.BuildConfig;
 import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
-import org.bochman.upapp.utils.SharedPreferencesUtils;
+import org.bochman.upapp.utils.SpUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +34,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  */
 public class PoiIntentService extends IntentService {
 
+    public static final String QUERY =  "query" ;
     String TAG = PoiIntentService.class.getSimpleName();
 
     /**
@@ -47,10 +48,10 @@ public class PoiIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        String query = intent.getStringExtra("query"); // gets the query from search buttons
+        String query = intent.getStringExtra(QUERY); // gets the query from search buttons
 
-        float userlat = (float) SharedPreferencesUtils.getLat(this);
-        float userlng = (float) SharedPreferencesUtils.getLng(this);
+        float userlat = (float) SpUtils.getLat(this);
+        float userlng = (float) SpUtils.getLng(this);
 
         // Specify the fields to return.
         List<Place.Field> placeFields =
