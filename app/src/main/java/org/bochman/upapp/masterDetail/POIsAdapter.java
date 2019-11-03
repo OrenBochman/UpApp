@@ -28,9 +28,9 @@ import java.util.List;
  */
 public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
 
+    private  List<Poi> mValues; // Cached copy of poi
+
     private final POIMasterActivity mParentActivity;
-    private final List<Poi> mValues;
-    //private final List<Poi> mValuesFiltered;
     private final boolean mTwoPane;
 
     POIsAdapter(POIMasterActivity parent,
@@ -39,9 +39,6 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         mValues = items;
         mParentActivity = parent;
         mTwoPane = twoPane;
-       // mValuesFiltered = new ArrayList<>();
-       // if(items!=null)
-       //     mValuesFiltered.addAll(items);
 
     } // SimpleItemRecyclerViewAdapter [:-}~
 
@@ -67,9 +64,19 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         holder.itemView.setOnLongClickListener(mOnLongClickListener);
     }
 
+    void setPoi(List<Poi> poi){
+        mValues = poi;
+        notifyDataSetChanged();
+    }
+
+    // getItemCount() is called many times, and when it is first called,
+    // mWords has not been updated (means initially, it's null, and we can't return null).
     @Override
     public int getItemCount() {
-        return mValues.size();
+        if(mValues!=null)
+            return mValues.size();
+        else
+            return 0;
     }
 
     //// adapter event handlers ///////////////////////////////////////////////////////////////

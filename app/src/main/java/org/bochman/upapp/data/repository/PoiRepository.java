@@ -28,7 +28,7 @@ public class PoiRepository {
         return mAllPois;
     }
 
-    public LiveData<List<Poi>> getmAllFavs() {
+    public LiveData<List<Poi>> getAllFavs() {
         return mAllFavs;
     }
 

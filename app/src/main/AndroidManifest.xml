@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.bochman.upapp">
+
     <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
+     The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+     Google Maps Android API v2, but you must specify either coarse or fine
+     location permissions for the 'MyLocation' functionality.
     -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".UpApp"
@@ -31,13 +33,10 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
         <activity
             android:name=".MapActivity"
             android:label="@string/title_activity_places_detail" />
+
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -60,7 +59,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.bochman.upapp.masterDetail.POIMasterActivity" />
         </activity>
-        <activity android:name=".favourites.FavouritesActivity"
+        <activity
+            android:name=".favourites.FavouritesActivity"
             android:parentActivityName=".masterDetail.POIMasterActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:targetApi="jelly_bean">
@@ -68,8 +68,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.bochman.upapp.masterDetail.POIMasterActivity" />
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
         <receiver android:name=".wifi.ConnectivityWatcher" />
+
+        <service android:name=".api.PoiIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>

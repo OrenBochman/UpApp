@@ -17,6 +17,9 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import org.bochman.upapp.BuildConfig;
 import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
+import org.bochman.upapp.data.repository.PoiRepository;
+import org.bochman.upapp.data.viewmodel.PoiViewModel;
+import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.SpUtils;
 
 import java.util.Arrays;
@@ -25,16 +28,18 @@ import java.util.Optional;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
- * An {@link IntentService} subclass for quearing places api off the main thread
+ * An {@link IntentService} subclass for querying places api off the main thread
  * <p>
  */
 public class PoiIntentService extends IntentService {
 
-    public static final String QUERY =  "query" ;
+    public static final String QUERY = "query";
     String TAG = PoiIntentService.class.getSimpleName();
 
     /**
@@ -48,10 +53,13 @@ public class PoiIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+        //PoiViewModel mPoiViewModel= new ViewModelProvider((ViewModelStoreOwner) getApplicationContext()).get(PoiViewModel.class);
+        PoiRepository mPoiRepository = new PoiRepository(getApplication());
+        assert intent != null;
         String query = intent.getStringExtra(QUERY); // gets the query from search buttons
-
         float userlat = (float) SpUtils.getLat(this);
         float userlng = (float) SpUtils.getLng(this);
+        Log.e(Debug.getTag(), String.format("onHandleIntent: %s %f %f ", query, userlat, userlng));
 
         // Specify the fields to return.
         List<Place.Field> placeFields =
@@ -59,8 +67,8 @@ public class PoiIntentService extends IntentService {
                         Place.Field.NAME,
                         Place.Field.LAT_LNG,
                         Place.Field.ADDRESS,
-                        Place.Field.PHONE_NUMBER,
-                        Place.Field.WEBSITE_URI,
+                        //       Place.Field.PHONE_NUMBER,
+                        //       Place.Field.WEBSITE_URI,
                         Place.Field.RATING);
 
         // Use the builder to create a FindCurrentPlaceRequest.
@@ -68,40 +76,60 @@ public class PoiIntentService extends IntentService {
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<FindCurrentPlaceResponse> placeResponse = ((UpApp) getApplicationContext()).getPlacesClient().findCurrentPlace(request);
+            Task<FindCurrentPlaceResponse> placeResponse = ((UpApp) getApplicationContext())
+                    .getPlacesClient()
+                    .findCurrentPlace(request);
             placeResponse.addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     FindCurrentPlaceResponse response = task.getResult();
-                    if(response!=null)
+                    if (response != null)
                         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                            Log.i(TAG, String.format("Place '%s' has likelihood: %f",
+                            Log.i(Debug.getTag(), String.format("Place '%s' has likelihood: %f",
                                     placeLikelihood.getPlace().getName(),
                                     placeLikelihood.getLikelihood()));
 
                             // handling nullable types in the response
                             Optional<LatLng> optionalLatLng = Optional.ofNullable(placeLikelihood.getPlace().getLatLng());
                             Optional<Double> optionalRating = Optional.ofNullable(placeLikelihood.getPlace().getRating());
-                            Optional<Uri> optionalWeb = Optional.ofNullable(placeLikelihood.getPlace().getWebsiteUri());
+                            Optional<Uri> optionalgetWebsiteUri = Optional.ofNullable(placeLikelihood.getPlace().getWebsiteUri());
 
-                            Poi poi = new Poi(
-                                    placeLikelihood.getPlace().getId(),
+                            Poi poi = new Poi(placeLikelihood.getPlace().getId(),
                                     placeLikelihood.getPlace().getName(),
                                     optionalLatLng.map(x -> x.latitude).orElse(0.0),
                                     optionalLatLng.map(x -> x.longitude).orElse(0.0),
                                     placeLikelihood.getPlace().getAddress(),
-                                    placeLikelihood.getPlace().getPhoneNumber(),
-                                    optionalWeb.map(Uri::toString).orElse(""),
+                                    "", //        placeLikelihood.getPlace().getPhoneNumber(),
+                                    optionalgetWebsiteUri.map(Uri::toString).orElse(""),
                                     optionalRating.orElse(0.0));
 
-                            ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insert(poi);
-                            Log.i(TAG, "Inserting into DB: " + poi.toString());
+                            //this needs to happen off the main/ui thread
+                            mPoiRepository.insert(poi);
+
+                            //((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insert(poi);
+                            Log.i(Debug.getTag(), "Inserting into DB: " + poi.toString());
                         }
 
                 } else {
                     Exception exception = task.getException();
                     if (exception instanceof ApiException) {
                         ApiException apiException = (ApiException) exception;
-                        Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                        String msg;
+                        switch (apiException.getStatusCode()) {
+                            case 9012:
+                                msg = "INVALID_REQUEST";
+                                break;
+                            case 9013:
+                                msg = "NOT_FOUND";
+                                break;
+                            case 9010:
+                                msg = "OVER_QUERY_LIMIT";
+                                break;
+                            case 9011:
+                                msg = "REQUEST_DENIED";
+                                break;
+                        }
+                        Log.e(Debug.getTag(), "msg " + apiException.getStatusCode(), apiException);
+
                     }
                 }
             });

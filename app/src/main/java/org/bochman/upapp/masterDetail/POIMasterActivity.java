@@ -25,6 +25,7 @@ import com.google.android.gms.location.SettingsClient;
 
 import org.bochman.upapp.R;
 import org.bochman.upapp.api.PoiIntentService;
+import org.bochman.upapp.data.viewmodel.PoiViewModel;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
@@ -43,6 +44,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -69,6 +71,7 @@ public class POIMasterActivity extends AppCompatActivity {
     Button nearbyButton;
     EditText queryText;
 
+    private PoiViewModel mPoiViewModel;
 
     /**
      * Request code for location permission request.
@@ -122,7 +125,15 @@ public class POIMasterActivity extends AppCompatActivity {
 
             //Do the search
             Intent intent = new Intent(this, PoiIntentService.class);
-            intent.putExtra(PoiIntentService.QUERY, queryText.getText());
+            intent.putExtra(PoiIntentService.QUERY, queryText.getText().toString());
+            startService(intent);
+        });
+
+        nearbyButton.setOnClickListener(v -> {
+
+            //Do the nearby search
+            Intent intent = new Intent(this, PoiIntentService.class);
+            intent.putExtra(PoiIntentService.QUERY, "");
             startService(intent);
         });
         SearchView searchView = findViewById(R.id.action_search);
@@ -139,7 +150,7 @@ public class POIMasterActivity extends AppCompatActivity {
             mTwoPane = true;
         }
         myContext = this;
-
+        mPoiViewModel =  new ViewModelProvider(this).get(PoiViewModel.class);
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
@@ -191,11 +202,11 @@ public class POIMasterActivity extends AppCompatActivity {
         SpUtils.setLng(location.getLongitude(),this);
 
         // New location has now been determined
-        StringBuilder msg = new StringBuilder()
-                .append("Updated Location: ")
-                .append(location.getLatitude())
-                .append(",").append(location.getLongitude());
-        Log.i(Debug.getTag(),msg.toString());
+//        StringBuilder msg = new StringBuilder()
+//                .append("Updated Location: ")
+//                .append(location.getLatitude())
+//                .append(",").append(location.getLongitude());
+//        Log.i(Debug.getTag(),msg.toString());
     }
 
     /**
