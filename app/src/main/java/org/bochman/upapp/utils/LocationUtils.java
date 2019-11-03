@@ -2,6 +2,7 @@ package org.bochman.upapp.utils;
 
 import android.content.Context;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Looper;
 
 import com.google.android.gms.location.LocationCallback;
@@ -66,8 +67,8 @@ public class LocationUtils {
      void onLocationChanged(Location location) {
         // New location has now been determined
         String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
+                location.getLatitude() + "," +
+                location.getLongitude();
         //Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
         // You can now create a LatLng Object for use with maps
         latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -83,15 +84,24 @@ public class LocationUtils {
      * @param metric - true for KM, false for Miles
      * @return distance in specified units
      */
-    public double calcDistance(Location source, Location destination, boolean metric ){
+    public static String calcDistance(LatLng source, LatLng destination, boolean metric ) {
+        Location lSource = new Location(LocationManager.GPS_PROVIDER);
+        lSource.setLatitude(source.latitude);
+        lSource.setLongitude(source.longitude);
+        Location lDestination = new Location(LocationManager.GPS_PROVIDER);
+        lDestination.setLatitude(destination.latitude);
+        lDestination.setLongitude(destination.longitude);
 
-        float meters = source.distanceTo(destination);
+        float meters = lSource.distanceTo(lDestination);
+
         if (metric)
-            return meters/1000.0;
+            if(meters<1000)
+                return Double.toString(Math.round(meters))+" m";
+            else
+                return Double.toString(Math.round(meters/1000))+" km";
         else
-            return meters/1609.344;
+            return  Double.toString(Math.round(meters/1609.344))+ " ml";
     }
-
 
     /**
      * bounding box using spherical approximation
@@ -99,15 +109,18 @@ public class LocationUtils {
      * @param radius distance in km say 50
      * @return
      */
-    RectangularBounds calcBounds(Location location, double radius){
+    RectangularBounds calcBounds(LatLng location, double radius){
 
         double R = 6371;  // earth radius in km
 
         //double radius = 50; // km
-        double x1 = location.getLongitude() - Math.toDegrees(radius/R/Math.cos(Math.toRadians(location.getLatitude())));
-        double x2 = location.getLongitude() + Math.toDegrees(radius/R/Math.cos(Math.toRadians(location.getLatitude())));
-        double y1 = location.getLatitude() + Math.toDegrees(radius/R);
-        double y2 = location.getLatitude() - Math.toDegrees(radius/R);
+        final double width = Math.toDegrees(radius / R / Math.cos(Math.toRadians(location.latitude)));
+        final double height =  Math.toDegrees(radius/R);
+
+        double x1 = location.longitude - width;
+        double x2 = location.longitude + width;
+        double y1 = location.latitude + height;
+        double y2 = location.latitude - height;
 
         RectangularBounds bounds = RectangularBounds.newInstance( new LatLng(x1, y1), new LatLng(x2,y2));
 

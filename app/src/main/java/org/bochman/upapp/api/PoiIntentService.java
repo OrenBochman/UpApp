@@ -53,7 +53,6 @@ public class PoiIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        //PoiViewModel mPoiViewModel= new ViewModelProvider((ViewModelStoreOwner) getApplicationContext()).get(PoiViewModel.class);
         PoiRepository mPoiRepository = new PoiRepository(getApplication());
         assert intent != null;
         String query = intent.getStringExtra(QUERY); // gets the query from search buttons
@@ -75,7 +74,8 @@ public class PoiIntentService extends IntentService {
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             Task<FindCurrentPlaceResponse> placeResponse = ((UpApp) getApplicationContext())
                     .getPlacesClient()
                     .findCurrentPlace(request);
@@ -91,7 +91,7 @@ public class PoiIntentService extends IntentService {
                             // handling nullable types in the response
                             Optional<LatLng> optionalLatLng = Optional.ofNullable(placeLikelihood.getPlace().getLatLng());
                             Optional<Double> optionalRating = Optional.ofNullable(placeLikelihood.getPlace().getRating());
-                            Optional<Uri> optionalgetWebsiteUri = Optional.ofNullable(placeLikelihood.getPlace().getWebsiteUri());
+                            Optional<Uri> optionalWebsiteUri = Optional.ofNullable(placeLikelihood.getPlace().getWebsiteUri());
 
                             Poi poi = new Poi(placeLikelihood.getPlace().getId(),
                                     placeLikelihood.getPlace().getName(),
@@ -99,7 +99,7 @@ public class PoiIntentService extends IntentService {
                                     optionalLatLng.map(x -> x.longitude).orElse(0.0),
                                     placeLikelihood.getPlace().getAddress(),
                                     "", //        placeLikelihood.getPlace().getPhoneNumber(),
-                                    optionalgetWebsiteUri.map(Uri::toString).orElse(""),
+                                    optionalWebsiteUri.map(Uri::toString).orElse(""),
                                     optionalRating.orElse(0.0));
 
                             //this needs to happen off the main/ui thread
@@ -111,21 +111,22 @@ public class PoiIntentService extends IntentService {
 
                 } else {
                     Exception exception = task.getException();
+                    //better error reporting to troubleshoot the api
                     if (exception instanceof ApiException) {
                         ApiException apiException = (ApiException) exception;
                         String msg;
                         switch (apiException.getStatusCode()) {
                             case 9012:
-                                msg = "INVALID_REQUEST";
+                                msg = "INVALID_REQUEST - place_id or field request issue";
                                 break;
                             case 9013:
-                                msg = "NOT_FOUND";
+                                msg = "NOT_FOUND - place_id no found in the db";
                                 break;
                             case 9010:
                                 msg = "OVER_QUERY_LIMIT";
                                 break;
                             case 9011:
-                                msg = "REQUEST_DENIED";
+                                msg = "REQUEST_DENIED - Api missing or invalid";
                                 break;
                         }
                         Log.e(Debug.getTag(), "msg " + apiException.getStatusCode(), apiException);

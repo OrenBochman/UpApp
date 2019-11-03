@@ -15,7 +15,7 @@ import androidx.room.Query;
 public interface PoiDao {
 
     @Query("Select * From Poi where id = :id")
-    public Poi getById(String id);
+    Poi getById(String id);
 
     @Query("SELECT * from Poi where isFavourite = 0")
     LiveData<List<Poi>> getAllPlaces();
@@ -24,15 +24,15 @@ public interface PoiDao {
     LiveData<List<Poi>> getAllFavourites();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public Long insert(Poi poi);
+    Long insert(Poi poi);
 
     @Delete
-    public void delete(Poi poi);
+    void delete(Poi poi);
 
     @Query("Delete  From Poi where isFavourite > 0 ")
-    public void deleteAllFavourites();
+    void deleteAllFavourites();
 
     @Query("Delete  from Poi where isFavourite = 0 ")
-    public void deleteAllPoi();
+    void deleteAllPoi();
 
 }

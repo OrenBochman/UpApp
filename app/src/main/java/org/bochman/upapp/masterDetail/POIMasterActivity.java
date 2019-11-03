@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,11 +24,11 @@ import com.google.android.gms.location.SettingsClient;
 
 import org.bochman.upapp.R;
 import org.bochman.upapp.api.PoiIntentService;
+import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
-import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.utils.SpUtils;
 import org.bochman.upapp.wifi.ConnectivityWatcher;
 import org.jetbrains.annotations.NotNull;
@@ -38,18 +37,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuItemCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
-import static org.bochman.upapp.utils.SpUtils.*;
+import static org.bochman.upapp.utils.SpUtils.getLastSearch;
+import static org.bochman.upapp.utils.SpUtils.setLastSearch;
 
 /**
  * An activity representing a list of Places. This activity
@@ -66,6 +68,7 @@ public class POIMasterActivity extends AppCompatActivity {
      */
     private final List<Poi> placesList = new ArrayList<>();
     POIsAdapter adapter;                    // the places adapter
+    RecyclerView recyclerView;
 
     Button searchButton;
     Button nearbyButton;
@@ -113,7 +116,7 @@ public class POIMasterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         startLocationUpdates();
-        placesList.add(new Poi("123", "Name",  0.0, 0.0,"Address","0544320000","http://goggle.com",4.0f));
+        placesList.add(new Poi("123", "Name", 0.0, 0.0, "Address", "0544320000", "http://goggle.com", 4.0f));
         String query = getLastSearch(this);
         queryText = findViewById(R.id.editTextQuery);
         searchButton = findViewById(R.id.buttonSearch);
@@ -136,9 +139,6 @@ public class POIMasterActivity extends AppCompatActivity {
             intent.putExtra(PoiIntentService.QUERY, "");
             startService(intent);
         });
-        SearchView searchView = findViewById(R.id.action_search);
-        // searchView.setQuery(query,true);
-        PoiSearch(query);
 
         LocationUtils locationutils = new LocationUtils(getApplicationContext());
 
@@ -150,16 +150,23 @@ public class POIMasterActivity extends AppCompatActivity {
             mTwoPane = true;
         }
         myContext = this;
-        mPoiViewModel =  new ViewModelProvider(this).get(PoiViewModel.class);
-        View recyclerView = findViewById(R.id.item_list);
+        mPoiViewModel = new ViewModelProvider(this).get(PoiViewModel.class);
+        recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
-    }
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         adapter = new POIsAdapter(this, placesList, mTwoPane);
         recyclerView.setAdapter(adapter);
+        mPoiViewModel.getAllPois().observe(this, new Observer<List<Poi>>() {
+            @Override
+            public void onChanged(@Nullable final List<Poi> pois) {
+                // Update the cached copy of the words in the adapter.
+                adapter.setPoi(pois);
+            }
+        });
+
     }
+
 
 
     // Trigger new location updates at interval
@@ -196,25 +203,25 @@ public class POIMasterActivity extends AppCompatActivity {
                 Looper.myLooper());
     }
 
-    public void onLocationChanged(Location location) {
-        //store in SharedPreferences for all to use with distance calculations.
-        SpUtils.setLat(location.getLatitude(),this);
-        SpUtils.setLng(location.getLongitude(),this);
 
-        // New location has now been determined
-//        StringBuilder msg = new StringBuilder()
-//                .append("Updated Location: ")
-//                .append(location.getLatitude())
-//                .append(",").append(location.getLongitude());
-//        Log.i(Debug.getTag(),msg.toString());
+    /**
+     * Handle location updates.
+     * <p>
+     * Store the new location in SharedPreferences for distance calculations, etc.
+     *
+     * @param location location update
+     */
+    private void onLocationChanged(Location location) {
+        SpUtils.setLat(location.getLatitude(), this);
+        SpUtils.setLng(location.getLongitude(), this);
     }
 
     /**
-     * TODO: figure out how to incorporate query in search.
+     * TODO: romve this method.
      *
      * @param query
      */
-    void PoiSearch(String query) {
+    void PoiSearchOld(String query) {
         // get places nearby
         placesUtils = PlacesUtils.getInstance(getApplicationContext());
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -238,13 +245,13 @@ public class POIMasterActivity extends AppCompatActivity {
         queryText.setText(getLastSearch(this));
 
         //Feature start wifi monitoring service - will not work for api >= 28 pie
-        registerReceiver( connectivityWatcher,new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        registerReceiver(connectivityWatcher, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
 
     /**
      *
      */
-    private ConnectivityWatcher connectivityWatcher=new ConnectivityWatcher();
+    private ConnectivityWatcher connectivityWatcher = new ConnectivityWatcher();
 
     /**
      * pause lifecycle handler
@@ -304,45 +311,55 @@ public class POIMasterActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * handle menu events.
+     * <p>
+     * TODO: Launch PreferenceActivity
+     *
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.places_list_activity_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        MenuItemCompat.getActionProvider(searchItem);
 
 
-        searchView.setOnQueryTextListener(
-                new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        //text changed apply filtering.
-
-                        if (query.length() == 0) {
-                            //Save search in shared preferences
-                            setLastSearch("", myContext);
-                            // run a search with the current location.
-                            PoiSearch("");
-                            //Toast.makeText(getApplicationContext(),"todo: local search ",Toast.LENGTH_SHORT).show();
-                        } else {
-
-                            //Save search in shared perferences
-                            setLastSearch(query, myContext);
-                            // run a search with the current query.
-                            PoiSearch(query);
-                            //Toast.makeText(getApplicationContext(),"todo: search for "+query,Toast.LENGTH_SHORT).show();
-                        }
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String newText) {
-                        //perform search.
-                        Toast.makeText(getApplicationContext(), "todo: filter for " + newText, Toast.LENGTH_SHORT).show();
-                        return true;
-                    }
-                }
-        );
+        //MenuItem searchItem = menu.findItem(R.id.action_search);
+        //       SearchView searchView = (SearchView) searchItem.getActionView();
+        //       MenuItemCompat.getActionProvider(searchItem);
+//
+//        searchView.setOnQueryTextListener(
+//                new SearchView.OnQueryTextListener() {
+//                    @Override
+//                    public boolean onQueryTextSubmit(String query) {
+//                        //text changed apply filtering.
+//
+//                        if (query.length() == 0) {
+//                            //Save search in shared preferences
+//                            setLastSearch("", myContext);
+//                            // run a search with the current location.
+//                            PoiSearch("");
+//                            //Toast.makeText(getApplicationContext(),"todo: local search ",Toast.LENGTH_SHORT).show();
+//                        } else {
+//
+//                            //Save search in shared preferences
+//                            setLastSearch(query, myContext);
+//                            // run a search with the current query.
+//                            PoiSearch(query);
+//                            //Toast.makeText(getApplicationContext(),"todo: search for "+query,Toast.LENGTH_SHORT).show();
+//                        }
+//                        return true;
+//                    }
+//
+//                    @Override
+//                    public boolean onQueryTextChange(String newText) {
+//                        //perform search.
+//                        Toast.makeText(getApplicationContext(), "todo: filter for " + newText, Toast.LENGTH_SHORT).show();
+//                        return true;
+//                    }
+//                }
+//        );
 
         return true;
     }

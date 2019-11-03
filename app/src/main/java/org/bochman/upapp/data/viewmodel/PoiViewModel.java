@@ -25,9 +25,9 @@ public class PoiViewModel extends AndroidViewModel {
 
     }
 
-    LiveData<List<Poi>> getAllPois(){return mAllPois;}
+    public LiveData<List<Poi>> getAllPois(){return mAllPois;}
 
-    LiveData<List<Poi>> getAllFavs(){return mAllFavs;}
+    public LiveData<List<Poi>> getAllFavs(){return mAllFavs;}
 
     public void insert(Poi poi) { mRepository.insert(poi); }
 

@@ -6,30 +6,46 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SpUtils {
+    static final String NAME = "History";
 
     static final String LAT = "lat";
     static final String LNG = "lng";
-    static final String QUERY = "History";
+    static final String QUERY = "query";
+    static final String IS_METRIC = "isMetric";
 
     static void setFloat(Double x, String key, Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
+        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putFloat(key, x.floatValue());
         editor.apply();
     }
 
+    static void setInt(int x, String key, Context ctx) {
+        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(key, x);
+        editor.apply();
+    }
+
     static void setString(String x, String key, Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
+        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
         android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, x);
         editor.apply();
     }
 
+    public static int getIsMetric(Context ctx) {
+        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(IS_METRIC, 1);
 
+    }
+
+    public static void setIsMetric(int isMetric, Context ctx) {
+        setInt(isMetric,IS_METRIC,ctx);
+    }
     public static String getLastSearch(Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences("History", Context.MODE_PRIVATE);
+        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
 
-        List<Object> pair = new LinkedList<>();
         String query = sharedPreferences.getString("query", "");
         return query;
     }
