@@ -140,7 +140,6 @@ public class POIMasterActivity extends AppCompatActivity {
         }
         myContext = this;
 
-
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);

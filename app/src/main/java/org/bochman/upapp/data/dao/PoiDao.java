@@ -24,15 +24,15 @@ public interface PoiDao {
     LiveData<List<Poi>> getAllFavourites();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public Long insertUser(Poi poi);
+    public Long insert(Poi poi);
 
     @Delete
-    public void deleteUser(Poi poi);
+    public void delete(Poi poi);
 
     @Query("Delete  From Poi where isFavourite > 0 ")
-    public void deleteFavourites();
+    public void deleteAllFavourites();
 
     @Query("Delete  from Poi where isFavourite = 0 ")
-    public void deleteNonFavourites();
+    public void deleteAllPoi();
 
 }

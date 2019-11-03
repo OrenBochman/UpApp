@@ -93,7 +93,7 @@ public class PoiIntentService extends IntentService {
                                     optionalWeb.map(Uri::toString).orElse(""),
                                     optionalRating.orElse(0.0));
 
-                            ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insertUser(poi);
+                            ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insert(poi);
                             Log.i(TAG, "Inserting into DB: " + poi.toString());
                         }
 

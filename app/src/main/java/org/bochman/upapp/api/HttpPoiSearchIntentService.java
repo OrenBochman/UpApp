@@ -66,7 +66,7 @@ public class HttpPoiSearchIntentService extends IntentService {
                 JSONObject rootObj = new JSONObject(result);
                 JSONArray array = rootObj.getJSONArray("results");
 
-                ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().deleteNonFavourites();
+                ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().deleteAllPoi();
 
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject place = array.getJSONObject(i);
@@ -103,7 +103,7 @@ public class HttpPoiSearchIntentService extends IntentService {
                     // insert the search results to DB
 
                     Poi poi = new Poi(placeId, name, lat, lng, address, phone, website, rating);
-                    ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insertUser(poi);
+                    ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insert(poi);
                     Log.i(TAG, "Inserting item +" + i + "+into DB: " + poi.toString());
                 }
                 Intent broadcastIntent = new Intent(ACTION_JSON);
