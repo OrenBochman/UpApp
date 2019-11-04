@@ -3,6 +3,7 @@ package org.bochman.upapp.favourites;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ class FavouritesViewHolder extends RecyclerView.ViewHolder {
     final TextView mDistance;
     final ImageView mPhoto;
     final Button mButton;
+    public RatingBar ratingBar;
 
     FavouritesViewHolder(View view) {
         super(view);
@@ -23,7 +25,7 @@ class FavouritesViewHolder extends RecyclerView.ViewHolder {
         mDistance=view.findViewById(R.id.distance);
         mPhoto=view.findViewById(R.id.photo);
         mButton=view.findViewById(R.id.share);
-
+        ratingBar =view.findViewById(R.id.rating);
         //favourite button and share.
 
     } // Viewholder [:-}~
