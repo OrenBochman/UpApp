@@ -4,29 +4,37 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.bochman.upapp.R;
 import org.bochman.upapp.data.enteties.Poi;
-import org.jetbrains.annotations.NotNull;
+import org.bochman.upapp.utils.LocationUtils;
+import org.bochman.upapp.utils.SpUtils;
 
 import java.util.List;
 
 public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesViewHolder> {
 
-    private final FavouritesActivity mParentActivity;
-    private final List<Poi> mValues;
+    // cached copy of poi data.
 
-
+    private  List<Poi> mValues;
+    // cache for the current location - updated whenever the data is updated.
+    private LatLng latlng;
+    // reference to the containing activity.
+    private  FavouritesActivity mParentActivity;
 
     FavouritesAdapter(FavouritesActivity parent,
                       List<Poi> items) {
         mValues = items;
         mParentActivity = parent;
-
+        getLatLng();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public FavouritesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -36,11 +44,31 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesViewHolder
 
     @Override
     public void onBindViewHolder(final FavouritesViewHolder holder, int position) {
-        holder.mNameView.setText(mValues.get(position).name);
-        holder.mAddressView.setText(mValues.get(position).address);
-        holder.mDistance.setText("20km");  // TODO: calculate the distance
-        //holder.mPhoto.setImageBitmap()); // TODO: add a method to fetch the photo for by via the places api + show via glide/etc
-        holder.itemView.setTag(mValues.get(position));
+
+        Poi poi=mValues.get(position);
+
+        holder.mNameView.setText(poi.name);
+        holder.mAddressView.setText(poi.address);
+        holder.mDistance.setText(
+                LocationUtils.calcDistance(latlng,
+                        new LatLng(poi.lat,poi.lng),
+                        SpUtils.getIsMetric(mParentActivity.getApplicationContext())==1));
+
+        if (holder.mPhoto != null)
+            if( poi.photoUri!=null && !poi.photoUri.isEmpty()) {
+                Picasso
+                        .get()
+                        .load(poi.photoUri)
+                        .into(holder.mPhoto);
+            }else{
+                holder.mPhoto.setImageDrawable(mParentActivity.getResources().getDrawable(R.drawable.ic_photo_black_24));
+            }
+
+        holder.ratingBar.setRating((float) poi.rating);
+        //holder.ratingBar.setEnabled(false);
+        holder.ratingBar.setIsIndicator(true);
+
+        holder.itemView.setTag(poi);
         //set the click handlers
         holder.itemView.setOnClickListener(mOnClickListener);
 
@@ -52,24 +80,28 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesViewHolder
 
     }
 
+    /**
+     * The method for refreshing cached poi following a search.
+     *
+     * @param data - new poi data
+     */
+    public void setData(List<Poi> data){
+        mValues = data;
+        getLatLng();
+        notifyDataSetChanged();
+    }
+
     private final View.OnClickListener mOnClickListener = view -> {
         Poi item = (Poi) view.getTag();
-//                if (mTwoPane) {
-//                    Bundle arguments = new Bundle();
-//                    arguments.putString(POIDetailFragment.POI_KEY, item.id);
-//                    POIDetailFragment fragment = new POIDetailFragment();
-//                    fragment.setArguments(arguments);
-//                    mParentActivity.getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.item_detail_container, fragment)
-//                            .commit();
-//                } else {
-//                    Context context = view.getContext();
-//                    Intent intent = new Intent(context, POIDetailActivity.class);
-//                    intent.putExtra(POIDetailFragment.POI_KEY, item.id);
-//
-//                    context.startActivity(intent);
-//                }
     };
 
+    //// utility methods /////////////////////////////////////////////////////////////////////////
+    /**
+     * helper to get the most recent location
+     */
+    private void getLatLng(){
+        latlng=new LatLng(SpUtils.getLat(mParentActivity.getApplicationContext()),
+                SpUtils.getLng(mParentActivity.getApplicationContext()));
+    }
 
 }
