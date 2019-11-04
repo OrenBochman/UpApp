@@ -10,9 +10,10 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationCallback;
@@ -26,12 +27,12 @@ import org.bochman.upapp.R;
 import org.bochman.upapp.api.PoiIntentService;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
+import org.bochman.upapp.settings.SettingsActivity;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
 import org.bochman.upapp.utils.SpUtils;
 import org.bochman.upapp.wifi.ConnectivityWatcher;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -161,7 +161,7 @@ public class POIMasterActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable final List<Poi> pois) {
                 // Update the cached copy of the words in the adapter.
-                adapter.setPoi(pois);
+                adapter.setData(pois);
             }
         });
 
@@ -296,7 +296,7 @@ public class POIMasterActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {// If request is cancelled, the result arrays are empty.
             if (permissions.length == 1 &&
                     permissions[0].equals(ACCESS_FINE_LOCATION) &&
@@ -313,8 +313,6 @@ public class POIMasterActivity extends AppCompatActivity {
 
     /**
      * handle menu events.
-     * <p>
-     * TODO: Launch PreferenceActivity
      *
      * @param menu
      * @return
@@ -323,45 +321,22 @@ public class POIMasterActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.places_list_activity_menu, menu);
-
-
-        //MenuItem searchItem = menu.findItem(R.id.action_search);
-        //       SearchView searchView = (SearchView) searchItem.getActionView();
-        //       MenuItemCompat.getActionProvider(searchItem);
-//
-//        searchView.setOnQueryTextListener(
-//                new SearchView.OnQueryTextListener() {
-//                    @Override
-//                    public boolean onQueryTextSubmit(String query) {
-//                        //text changed apply filtering.
-//
-//                        if (query.length() == 0) {
-//                            //Save search in shared preferences
-//                            setLastSearch("", myContext);
-//                            // run a search with the current location.
-//                            PoiSearch("");
-//                            //Toast.makeText(getApplicationContext(),"todo: local search ",Toast.LENGTH_SHORT).show();
-//                        } else {
-//
-//                            //Save search in shared preferences
-//                            setLastSearch(query, myContext);
-//                            // run a search with the current query.
-//                            PoiSearch(query);
-//                            //Toast.makeText(getApplicationContext(),"todo: search for "+query,Toast.LENGTH_SHORT).show();
-//                        }
-//                        return true;
-//                    }
-//
-//                    @Override
-//                    public boolean onQueryTextChange(String newText) {
-//                        //perform search.
-//                        Toast.makeText(getApplicationContext(), "todo: filter for " + newText, Toast.LENGTH_SHORT).show();
-//                        return true;
-//                    }
-//                }
-//        );
-
+        MenuItem preferencesItem = menu.findItem(R.id.action_preferences);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case R.id.action_preferences:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+
     }
 
 } // POIListActivity :-}8
