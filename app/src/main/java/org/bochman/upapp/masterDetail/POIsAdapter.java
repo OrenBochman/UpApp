@@ -2,7 +2,6 @@ package org.bochman.upapp.masterDetail;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.bochman.upapp.favourites.FavouritesActivity;
@@ -19,7 +20,6 @@ import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.SpUtils;
-import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
 
     //// adapter overrides ////////////////////////////////////////////////////////////////////
 
-    @NotNull
+    @NonNull
     @Override
     public POIViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -73,14 +73,25 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         Poi poi=mValues.get(position);
         holder.mNameView.setText(poi.name);
         holder.mAddressView.setText(poi.address);
-
         holder.mDistance.setText(
                 LocationUtils.calcDistance(latlng,
                         new LatLng(poi.lat,poi.lng),
                         SpUtils.getIsMetric(mParentActivity.getApplicationContext())==1));
 
-        //holder.mPhoto.setImageBitmap()); // TODO: add a method to fetch the photo via the api
-        holder.itemView.setTag(mValues.get(position));
+
+
+        if (holder.mPhoto != null)
+            if( poi.photoUri!=null && !poi.photoUri.isEmpty()) {
+            Picasso
+                    .get()
+                    .load(poi.photoUri)
+                    .into(holder.mPhoto);
+            }else{
+                holder.mPhoto.setImageDrawable(mParentActivity.getResources().getDrawable(R.drawable.ic_photo_black_24));
+            }
+
+
+        holder.itemView.setTag(poi);
         //set the click handlers
         holder.itemView.setOnClickListener(mOnClickListener);
         holder.itemView.setOnLongClickListener(mOnLongClickListener);
@@ -89,13 +100,12 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     /**
      * The method for refreshing cached poi following a search.
      *
-     * @param poi - new poi data
+     * @param data - new poi data
      */
-    public void setPoi(List<Poi> poi){
-        mValues = poi;
+    public void setData(List<Poi> data){
+        mValues = data;
         getLatLng();
         notifyDataSetChanged();
-
     }
 
 
@@ -160,7 +170,6 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     private void getLatLng(){
         latlng=new LatLng(SpUtils.getLat(mParentActivity.getApplicationContext()),
                 SpUtils.getLng(mParentActivity.getApplicationContext()));
-
     }
 
 } // POIsAdapter :-}8
