@@ -157,20 +157,24 @@ dependencies {
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
 
     // Retrofit 2
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.squareup.retrofit2:retrofit:2.6.2'
-    implementation 'com.squareup.retrofit2:converter-gson:2.6.2'
-    implementation 'com.squareup.retrofit2:adapter-rxjava:2.6.2'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.2.2'
+//    implementation 'com.google.code.gson:gson:2.8.6'
+//    implementation 'com.squareup.retrofit2:retrofit:2.6.2'
+//    implementation 'com.squareup.retrofit2:converter-gson:2.6.2'
+//    implementation 'com.squareup.retrofit2:adapter-rxjava:2.6.2'
+//    implementation 'com.squareup.okhttp3:logging-interceptor:4.2.2'
 
     // Dagger 2
-    api 'com.google.dagger:dagger-android:2.25.2'
-    api 'com.google.dagger:dagger-android-support:2.25.2' // if you use the support libraries
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.25.2'
+    // api 'com.google.dagger:dagger-android:2.25.2'
+    // api 'com.google.dagger:dagger-android-support:2.25.2' // if you use the support libraries
+    // annotationProcessor 'com.google.dagger:dagger-android-processor:2.25.2'
 
     // ButterKnife
-    implementation 'com.jakewharton:butterknife:10.2.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
+    //implementation 'com.jakewharton:butterknife:10.2.0'
+    //annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
+
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 
     // Testing ///////////////////////////////////////////////////////////////////////
     testImplementation 'junit:junit:4.12'
