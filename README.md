@@ -27,7 +27,7 @@ Some patterns in use :
 * viewHolder patten
 * master detail pattern
 * singleton patten
-* [repository pattern[(https://developer.android.com/jetpack/docs/guide) - Repository is a facade for accessing the db off the main thread.
+* [repository pattern](https://developer.android.com/jetpack/docs/guide) Repository is a facade for accessing the db off the main thread.
 
 # References
 
