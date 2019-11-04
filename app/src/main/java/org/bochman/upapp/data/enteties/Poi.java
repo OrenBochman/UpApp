@@ -35,6 +35,9 @@ public class Poi {
     public Integer isFavourite;  //1 is favourite 0 is not
     @ColumnInfo
     public double  rating;
+    @ColumnInfo
+    public String photoUri;
+
 
 //
 //    public Poi(String id, String name, String address, double lat, double lng){
@@ -56,6 +59,7 @@ public class Poi {
         this.website = website;
         this.isFavourite = 0;
         this.rating = rating;
+        this.photoUri="";
     }
 
     @Override
