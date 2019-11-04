@@ -1,0 +1,51 @@
+# UpApp
+
+Android Capstone Project.
+
+Some Features:
+
+* MVVM architecture
+* live data + observable for updates
+* using Master Detail flow
+* adaptive and responsive layout (for handsets and tablets)
+* RecyclerViews
+* Google Maps + Google Places api
+* Room Database.
+* Room DB migrations.
+* Perferences
+* Persisting prefrences using 
+* Photos using Picasso third party library.
+* Requesting permissions
+* Overriding the application object.
+* IntentService to handle api requests off the main thread.
+* BroadcastReviever to check for connectivity.
+
+
+Some patterns in use :
+
+# MVVM
+# viewHolder patten
+# master detail pattern
+# singleton patten 
+# repository pattern (Repository is a on stop shop facade for the accessing the database off the main thread)
+
+# References
+
+Modern development relies on databases like stackoverflow.
+The following information & code snippets proved useful:
+
+* (How to use vector drawables in Android API lower 21?)[https://stackoverflow.com/questions/34417843/how-to-use-vector-drawables-in-android-api-lower-21/34417988]
+* (Please provide a Migration in the builder or call fallbackToDestructiveMigration in the builder in which case Room will re-create all of the tables)[https://stackoverflow.com/questions/49629656/please-provide-a-migration-in-the-builder-or-call-fallbacktodestructivemigration]
+* (Understanding migrations with Room)[https://medium.com/androiddevelopers/understanding-migrations-with-room-f01e04b07929] by Florina Muntenescu
+* (How to convert lat lng to a Location variable?)[https://stackoverflow.com/questions/31099140/how-to-convert-lat-lng-to-a-location-variable]
+* (Places SDK for Android - Place Autocomplete)[https://developers.google.com/places/android-sdk/autocomplete#get_place_predictions_programmatically]
+* (Android Room with a View CodeLab)[https://codelabs.developers.google.com/codelabs/android-room-with-a-view]
+* (How to ask for location permission in Android Studio?)[https://stackoverflow.com/questions/57098852/how-to-ask-for-location-permission-in-android-studio]
+* (Requesting App permissions)[https://developer.android.com/training/permissions/requesting]
+* ()[https://stackoverflow.com/questions/7094606/android-stop-start-service-depending-on-wifi-state]
+* ()[https://stackoverflow.com/questions/48279481/multiple-tables-with-same-type-of-objects-in-room-database]
+* (data doesn't show up on recyclerview - got error No layout manager attached; skipping layout)[https://stackoverflow.com/questions/51359950/data-doesnt-show-up-on-recyclerview-got-error-no-layout-manager-attached-ski]
+
+Others were less useful
+
+* (any layout manager for ConstraintLayout?)[https://stackoverflow.com/questions/37803180/any-layout-manager-for-constraintlayout]
