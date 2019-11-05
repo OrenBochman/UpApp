@@ -119,7 +119,7 @@ public class POIMasterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         startLocationUpdates();
-        placesList.add(new Poi("123", "Name", 0.0, 0.0, "Address", "0544320000", "http://goggle.com", 4.0f));
+        //placesList.add(new Poi("123", "Name", 0.0, 0.0, "Address", "0544320000", "http://goggle.com", 4.0f));
         String query = getLastSearch(this);
         queryText = findViewById(R.id.editTextQuery);
         searchButton = findViewById(R.id.buttonSearch);
@@ -149,13 +149,15 @@ public class POIMasterActivity extends AppCompatActivity {
             mTwoPane = true;
         }
         myContext = this;
-        mPoiViewModel = new ViewModelProvider(this).get(PoiViewModel.class);
         recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new POIsAdapter(this, placesList, mTwoPane);
         recyclerView.setAdapter(adapter);
+
+        // get the ViewModel and observe changes to the poi list
+        mPoiViewModel = new ViewModelProvider(this).get(PoiViewModel.class);
         mPoiViewModel.getAllPois().observe(this, new Observer<List<Poi>>() {
             @Override
             public void onChanged(@Nullable final List<Poi> pois) {
