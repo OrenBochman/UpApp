@@ -131,7 +131,7 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         if (mTwoPane) {
             // replace the current fragment with a new fragment with required item.
             Bundle arguments = new Bundle();
-            arguments.putString(POIDetailFragment.ARG_ITEM_ID, item.id);
+            arguments.putParcelable(POIDetailFragment.ARG_ITEM_ID, Parcels.wrap(item) );
             POIDetailFragment fragment = new POIDetailFragment();
             fragment.setArguments(arguments);
             mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -153,11 +153,10 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     private final View.OnLongClickListener mOnLongClickListener = view -> {
         Log.i(Debug.getTag(), "OnLongClick");
         Poi item = (Poi) view.getTag();
-        //add to favourites by passing the item's id with the intent.
+        // add to favourites by passing the item's with the intent.
         Context context = view.getContext();
         Intent intent = new Intent(context, FavouritesActivity.class);
         intent.putExtra(FavouritesActivity.POI_KEY, Parcels.wrap(item) );
-
         context.startActivity(intent);
         return true;
     };
