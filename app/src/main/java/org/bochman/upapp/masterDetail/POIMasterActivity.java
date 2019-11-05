@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -88,7 +89,9 @@ public class POIMasterActivity extends AppCompatActivity {
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
     private boolean mPermissionDenied = false;
+    /** Flag indicating whether a the search query should be used in the search */
 
+    private  boolean useQuery=false;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
      */
@@ -125,19 +128,15 @@ public class POIMasterActivity extends AppCompatActivity {
         // Feature: restoring saved search.
         queryText.setText(query);
         searchButton.setOnClickListener(v -> {
+            useQuery=true;
+            this.PoiSearch(true);
 
-            //Do the search
-            Intent intent = new Intent(this, PoiIntentService.class);
-            intent.putExtra(PoiIntentService.QUERY, queryText.getText().toString());
-            startService(intent);
         });
 
         nearbyButton.setOnClickListener(v -> {
+            useQuery=false;
+            this.PoiSearch(false);
 
-            //Do the nearby search
-            Intent intent = new Intent(this, PoiIntentService.class);
-            intent.putExtra(PoiIntentService.QUERY, "");
-            startService(intent);
         });
 
         LocationUtils locationutils = new LocationUtils(getApplicationContext());
@@ -166,8 +165,6 @@ public class POIMasterActivity extends AppCompatActivity {
         });
 
     }
-
-
 
     // Trigger new location updates at interval
     protected void startLocationUpdates() {
@@ -200,9 +197,8 @@ public class POIMasterActivity extends AppCompatActivity {
                         onLocationChanged(locationResult.getLastLocation());
                     }
                 },
-                Looper.myLooper());
+                Looper.myLooper());     //TODO: change looper to work off main thread!
     }
-
 
     /**
      * Handle location updates.
@@ -216,22 +212,23 @@ public class POIMasterActivity extends AppCompatActivity {
         SpUtils.setLng(location.getLongitude(), this);
     }
 
-    /**
-     * TODO: romve this method.
-     *
-     * @param query
-     */
-    void PoiSearchOld(String query) {
-        // get places nearby
-        placesUtils = PlacesUtils.getInstance(getApplicationContext());
-        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            placesUtils.fetchCurrentPlaces(placesList);
+//    /**
+//     * TODO: reomve this method.
+//     *
+//     * @param query
+//     */
+//    void PoiSearchOld(String query) {
+//        // get places nearby
+//        placesUtils = PlacesUtils.getInstance(getApplicationContext());
+//        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            placesUtils.fetchCurrentPlaces(placesList);
+//
+//        } else {
+//            getLocationPermission();
+//            Toast.makeText(this, "Permission Issue in PoiSearch", Toast.LENGTH_LONG).show();
+//        }
+//    }
 
-        } else {
-            getLocationPermission();
-            Toast.makeText(this, "Permission Issue in PoiSearch", Toast.LENGTH_LONG).show();
-        }
-    }
 
     /**
      * resume lifecycle handler
@@ -268,21 +265,56 @@ public class POIMasterActivity extends AppCompatActivity {
         unregisterReceiver(connectivityWatcher);
     }
 
+    /** actual search request */
+    private void PoiSearchQuery() {
 
-    void getLocationPermission() {
+        Intent intent = new Intent(this, PoiIntentService.class);
+        String query = useQuery ? queryText.getText().toString() : "";
+        intent.putExtra(PoiIntentService.QUERY, query);
+        startService(intent);
+    }
+    /** check permission and make request request */
+    protected void PoiSearch(boolean useQuery){
+
+        this.useQuery=useQuery;
+        hideSoftKeyBoard();
+        // get places nearby
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            PoiSearchQuery();
+        } else {
+            Log.e(Debug.getTag(), "permissions not granted - getting permission");
+
+            getLocationPermission(ACCESS_FINE_LOCATION);
+        }
+    }
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+
+
+    final String accessFineLocation = ACCESS_FINE_LOCATION;
+    //get permission for
+    void getLocationPermission(String Permission) {
+
         // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(Debug.getTag(), "ACCESS_FINE_LOCATION not granted !");
+        if (ContextCompat.checkSelfPermission(this, Permission) != PackageManager.PERMISSION_GRANTED) {
+            Log.e(Debug.getTag(), "Permission not granted !");
             // Permission is not granted
             // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Log.e(Debug.getTag(), "ACCESS_FINE_LOCATION not granted !");
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Permission)) {
+                Log.e(Debug.getTag(), "Permission not granted and explanation required for permission");
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
             } else {
                 // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+                Log.e(Debug.getTag(), "Permission not granted but no explanation required for permission request");
+                ActivityCompat.requestPermissions(this, new String[]{Permission}, LOCATION_PERMISSION_REQUEST_CODE);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
@@ -290,23 +322,27 @@ public class POIMasterActivity extends AppCompatActivity {
             }
         } else {
             // Permission has already been granted
-            placesUtils.fetchCurrentPlaces(placesList);
+            //placesUtils.fetchCurrentPlaces(placesList);
+            Log.e(Debug.getTag(), "permission already granted !");
+
 
         }
     }
 
+    /** callback for permission requests */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {// If request is cancelled, the result arrays are empty.
             if (permissions.length == 1 &&
                     permissions[0].equals(ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                placesUtils.fetchCurrentPlaces(placesList);
+                //do the search again!
+                PoiSearchQuery();
             } else {
                 Log.e(Debug.getTag(), "permissions.length=" + permissions.length);
                 Log.e(Debug.getTag(), "permissions[0]=" + permissions[0]);
                 Log.e(Debug.getTag(), "grantResults[0]=" + PackageManager.PERMISSION_GRANTED);
-                Toast.makeText(this, "Permission Denied", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Permission Denied - Search Not available", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -335,8 +371,6 @@ public class POIMasterActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
-
     }
 
 } // POIListActivity :-}8
