@@ -27,7 +27,7 @@ public class UpApp extends Application {
         super.onCreate();
         CacheUtils.initializeCache(this);
 
-
+        //this.setString(R.string.google_maps_key,);
         // Initialize FusedLocation APIs
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
