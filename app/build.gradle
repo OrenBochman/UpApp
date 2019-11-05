@@ -180,7 +180,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     // Core library
-    androidTestImplementation 'androidx.test:core:1.2.0'
+  //  androidTestImplementation 'androidx.test:core:1.2.0'
 
     // AndroidJUnitRunner and JUnitRules
     androidTestImplementation 'androidx.test:runner:1.2.0'
