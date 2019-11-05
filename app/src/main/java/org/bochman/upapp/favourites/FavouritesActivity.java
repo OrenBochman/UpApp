@@ -1,18 +1,24 @@
 package org.bochman.upapp.favourites;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.opengl.GLDebugHelper;
 import android.os.Bundle;
+import android.util.DebugUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.bochman.upapp.data.viewmodel.PoiViewModel;
 import org.bochman.upapp.masterDetail.POIMasterActivity;
 import org.bochman.upapp.R;
 import org.bochman.upapp.settings.SettingsActivity;
@@ -34,7 +40,10 @@ public class FavouritesActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     /**  the key used by POIListActivity for passing a favourite via an intent */
     public static final String POI_KEY = "POI";
+
     Poi poi;
+    private PoiViewModel mPoiViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,10 +59,11 @@ public class FavouritesActivity extends AppCompatActivity {
         }
 
         //get the favourite and add to the list
-        Poi poi = Parcels.unwrap(getIntent()
-                .getParcelableExtra(FavouritesActivity.POI_KEY) );
+        Poi poi = Parcels.unwrap(getIntent().getParcelableExtra(FavouritesActivity.POI_KEY) );
 
-        Log.i(Debug.getTag(),"POI passed = "+ poi.toString());
+        Log.i(Debug.getTag(),"POI in intent is = "+ poi.toString());
+        //add poi to repo.
+
         //fetch the list from
         favouritesList.add(poi);
 
@@ -62,6 +72,23 @@ public class FavouritesActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new FavouritesAdapter(this, favouritesList);
         recyclerView.setAdapter(adapter);
+
+        // get the ViewModel and observe changes to the favourites list
+
+        mPoiViewModel = new ViewModelProvider(this).get(PoiViewModel.class);
+        mPoiViewModel.delete(poi.id);
+        mPoiViewModel.getAllFavs().observe(this, new Observer<List<Poi>>() {
+            @Override
+            public void onChanged(@Nullable final List<Poi> pois) {
+                // Update the cached copy of the words in the adapter.
+                Log.i(Debug.getTag(), "onChanged: - " + pois.size());
+                adapter.setData(pois);
+            }
+        });
+
+        poi.isFavourite=1;
+        mPoiViewModel.insert(poi);
+
     }
 
 
