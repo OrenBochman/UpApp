@@ -8,12 +8,18 @@ import android.view.MenuItem;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
+import androidx.fragment.app.Fragment;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import org.bochman.upapp.R;
+import org.bochman.upapp.data.repository.PoiRepository;
 import org.bochman.upapp.masterDetail.POIMasterActivity;
 
-public class SettingsActivity extends AppCompatActivity {
+import java.util.Objects;
+
+public class SettingsActivity extends AppCompatActivity implements
+        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,18 +27,53 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activty_settings);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.settings, new SettingsFragment())
+                .replace(R.id.settings_container, new SettingsFragment())
                 .commit();
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+    }
+
+    @Override
+    public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, androidx.preference.Preference pref) {
+        // Instantiate the new Fragment
+        final Bundle args = pref.getExtras();
+        final Fragment fragment = getSupportFragmentManager().getFragmentFactory().instantiate(
+                getClassLoader(),
+                pref.getFragment());
+        fragment.setArguments(args);
+        fragment.setTargetFragment(caller, 0);
+        // Replace the existing Fragment with the new Fragment
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.settings_container, fragment)
+                .addToBackStack(null)
+                .commit();
+        return true;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
+
+        Preference DeleteFavouritesPreference= findPreference("delete_favourites");
+
+            assert DeleteFavouritesPreference != null;
+            DeleteFavouritesPreference.setOnPreferenceClickListener(preference -> {
+
+                PoiRepository poiRepository=new PoiRepository(Objects.requireNonNull(getActivity()).getApplication());
+                poiRepository.deleteFavourites();
+                return true;
+            });
+
+            // do something with this preference
         }
     }
 
@@ -80,4 +121,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
     }
+
+
+
 }
