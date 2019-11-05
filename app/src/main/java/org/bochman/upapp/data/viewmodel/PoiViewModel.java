@@ -31,4 +31,7 @@ public class PoiViewModel extends AndroidViewModel {
 
     public void insert(Poi poi) { mRepository.insert(poi); }
 
+    public void delete(String id) { mRepository.delete(id); }
+
+
 }
