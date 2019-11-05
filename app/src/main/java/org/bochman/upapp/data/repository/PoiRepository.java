@@ -32,6 +32,28 @@ public class PoiRepository {
         return mAllFavs;
     }
 
+
+
+    public void deletePois() {
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                mPoiDao.deleteAllPoi();
+            }
+        }).start();
+
+    }
+
+    public void deleteFavourites() {
+
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                mPoiDao.deleteAllFavourites();
+            }
+        }).start();
+    }
+
     public void insert (Poi Poi) {
         new insertAsyncTask(mPoiDao).execute(Poi);
     }
