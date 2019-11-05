@@ -33,18 +33,24 @@ public class PoiRepository {
     }
 
 
-
-    public void deletePois() {
+    public void delete(String id) {
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                mPoiDao.delete(id);
+            }
+        }).start();
+    }
+    public void deleteAllPois() {
         new Thread(new Runnable(){
             @Override
             public void run() {
                 mPoiDao.deleteAllPoi();
             }
         }).start();
-
     }
 
-    public void deleteFavourites() {
+    public void deleteAllFavourites() {
 
         new Thread(new Runnable(){
             @Override
