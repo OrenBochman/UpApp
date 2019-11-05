@@ -9,16 +9,17 @@ import android.util.Log;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.bochman.upapp.BuildConfig;
 import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.repository.PoiRepository;
-import org.bochman.upapp.data.viewmodel.PoiViewModel;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.SpUtils;
 
@@ -28,8 +29,6 @@ import java.util.Optional;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -49,11 +48,8 @@ public class PoiIntentService extends IntentService {
         super("PoiIntentService");
     }
 
-    final static String API_KEY = BuildConfig.google_maps_key;
-
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        PoiRepository mPoiRepository = new PoiRepository(getApplication());
         assert intent != null;
         String query = intent.getStringExtra(QUERY); // gets the query from search buttons
         float userlat = (float) SpUtils.getLat(this);
@@ -69,46 +65,59 @@ public class PoiIntentService extends IntentService {
                         //       Place.Field.PHONE_NUMBER,
                         //       Place.Field.WEBSITE_URI,
                         Place.Field.RATING);
-
+        //init places
+        Places.initialize(this, BuildConfig.google_maps_key);
+        PlacesClient placesClient = Places.createClient(this);
         // Use the builder to create a FindCurrentPlaceRequest.
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            Task<FindCurrentPlaceResponse> placeResponse = ((UpApp) getApplicationContext())
-                    .getPlacesClient()
-                    .findCurrentPlace(request);
+            Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
             placeResponse.addOnCompleteListener(task -> {
+                /// do this in another thread
                 if (task.isSuccessful()) {
-                    FindCurrentPlaceResponse response = task.getResult();
-                    if (response != null)
-                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                            Log.i(Debug.getTag(), String.format("Place '%s' has likelihood: %f",
-                                    placeLikelihood.getPlace().getName(),
-                                    placeLikelihood.getLikelihood()));
 
-                            // handling nullable types in the response
-                            Optional<LatLng> optionalLatLng = Optional.ofNullable(placeLikelihood.getPlace().getLatLng());
-                            Optional<Double> optionalRating = Optional.ofNullable(placeLikelihood.getPlace().getRating());
-                            Optional<Uri> optionalWebsiteUri = Optional.ofNullable(placeLikelihood.getPlace().getWebsiteUri());
+                    //process the response off main thread.
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                            Poi poi = new Poi(placeLikelihood.getPlace().getId(),
-                                    placeLikelihood.getPlace().getName(),
-                                    optionalLatLng.map(x -> x.latitude).orElse(0.0),
-                                    optionalLatLng.map(x -> x.longitude).orElse(0.0),
-                                    placeLikelihood.getPlace().getAddress(),
-                                    "", //        placeLikelihood.getPlace().getPhoneNumber(),
-                                    optionalWebsiteUri.map(Uri::toString).orElse(""),
-                                    optionalRating.orElse(0.0));
+                            FindCurrentPlaceResponse response = task.getResult();
+                            if (response != null) {
+                                PoiRepository mPoiRepository = new PoiRepository(getApplication());
+                                mPoiRepository.deletePois();
+                                for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                                    Log.i(Debug.getTag(), String.format("Place '%s' has likelihood: %f",
+                                            placeLikelihood.getPlace().getName(),
+                                            placeLikelihood.getLikelihood()));
 
-                            //this needs to happen off the main/ui thread
-                            mPoiRepository.insert(poi);
+                                    // handling nullable types in the response
+                                    Optional<LatLng> optionalLatLng = Optional.ofNullable(placeLikelihood.getPlace().getLatLng());
+                                    Optional<Double> optionalRating = Optional.ofNullable(placeLikelihood.getPlace().getRating());
+                                    Optional<Uri> optionalWebsiteUri = Optional.ofNullable(placeLikelihood.getPlace().getWebsiteUri());
 
-                            //((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insert(poi);
-                            Log.i(Debug.getTag(), "Inserting into DB: " + poi.toString());
+                                    Poi poi = new Poi(placeLikelihood.getPlace().getId(),
+                                            placeLikelihood.getPlace().getName(),
+                                            optionalLatLng.map(x -> x.latitude).orElse(0.0),
+                                            optionalLatLng.map(x -> x.longitude).orElse(0.0),
+                                            placeLikelihood.getPlace().getAddress(),
+                                            "", //        placeLikelihood.getPlace().getPhoneNumber(),
+                                            optionalWebsiteUri.map(Uri::toString).orElse(""),
+                                            optionalRating.orElse(0.0));
+
+                                    //this needs to happen off the main/ui thread
+
+                                    mPoiRepository.insert(poi);
+
+                                    //((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insert(poi);
+                                    Log.i(Debug.getTag(), "Inserting into DB: " + poi.toString());
+
+                                }
+                            }
                         }
-
+                    }).start();
                 } else {
                     Exception exception = task.getException();
                     //better error reporting to troubleshoot the api
@@ -116,6 +125,9 @@ public class PoiIntentService extends IntentService {
                         ApiException apiException = (ApiException) exception;
                         String msg;
                         switch (apiException.getStatusCode()) {
+                            case 15:
+                                msg = "Location timeout";
+                                break;
                             case 9012:
                                 msg = "INVALID_REQUEST - place_id or field request issue";
                                 break;
