@@ -26,13 +26,13 @@ public interface PoiDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insert(Poi poi);
 
-    @Delete
-    void delete(Poi poi);
+    @Query("Delete From Poi where id Like :id")
+    int delete(String id);
 
-    @Query("Delete  From Poi where isFavourite > 0 ")
-    void deleteAllFavourites();
+    @Query("Delete  From Poi where isFavourite = 1 ")
+    int deleteAllFavourites();
 
-    @Query("Delete  from Poi where isFavourite = 0 ")
-    void deleteAllPoi();
+    @Query("Delete  From Poi where isFavourite = 0 ")
+    int deleteAllPoi();
 
 }
