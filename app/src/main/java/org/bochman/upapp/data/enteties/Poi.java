@@ -95,4 +95,20 @@ public class Poi {
         result = (31 * result + (rating != +0.0f ? (int)Double.doubleToLongBits(rating) : 0));
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Poi{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", lat=" + lat +
+                ", lng=" + lng +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", website='" + website + '\'' +
+                ", isFavourite=" + isFavourite +
+                ", rating=" + rating +
+                ", photoUri='" + photoUri + '\'' +
+                '}';
+    }
 }
