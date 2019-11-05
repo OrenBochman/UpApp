@@ -17,7 +17,6 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.bochman.upapp.BuildConfig;
-import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.repository.PoiRepository;
 import org.bochman.upapp.utils.Debug;
@@ -87,7 +86,7 @@ public class PoiIntentService extends IntentService {
                             FindCurrentPlaceResponse response = task.getResult();
                             if (response != null) {
                                 PoiRepository mPoiRepository = new PoiRepository(getApplication());
-                                mPoiRepository.deletePois();
+                                mPoiRepository.deleteAllPois();
                                 for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                                     Log.i(Debug.getTag(), String.format("Place '%s' has likelihood: %f",
                                             placeLikelihood.getPlace().getName(),
