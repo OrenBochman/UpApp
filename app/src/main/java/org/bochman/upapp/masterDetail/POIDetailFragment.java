@@ -7,6 +7,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import org.bochman.upapp.R;
 import org.bochman.upapp.data.enteties.Poi;
+import org.bochman.upapp.utils.Debug;
 import org.parceler.Parcels;
 
 /**
@@ -51,6 +53,8 @@ public class POIDetailFragment extends Fragment {
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
             mItem =  Parcels.unwrap(getArguments().getParcelable(ARG_ITEM_ID));
+            Log.i(Debug.getTag(),"POI in intent is = "+ mItem.toString());
+
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
