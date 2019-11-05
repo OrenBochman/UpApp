@@ -69,7 +69,7 @@ public class SettingsActivity extends AppCompatActivity implements
             DeleteFavouritesPreference.setOnPreferenceClickListener(preference -> {
 
                 PoiRepository poiRepository=new PoiRepository(Objects.requireNonNull(getActivity()).getApplication());
-                poiRepository.deleteFavourites();
+                poiRepository.deleteAllFavourites();
                 return true;
             });
 
