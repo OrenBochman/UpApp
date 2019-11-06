@@ -14,7 +14,7 @@ def getProps(String propName) {
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "org.bochman.myapplication"
+        applicationId "org.bochman.upapp"
         minSdkVersion 16        //needed by places sdk
         targetSdkVersion 28
         versionCode 1
