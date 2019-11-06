@@ -23,6 +23,12 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.bochman.upapp.R;
 import org.bochman.upapp.api.PoiIntentService;
@@ -62,7 +68,8 @@ import static org.bochman.upapp.utils.SpUtils.setLastSearch;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class POIMasterActivity extends AppCompatActivity {
+public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCallback {
+
 
     /**
      * the list of places of interest
@@ -74,6 +81,10 @@ public class POIMasterActivity extends AppCompatActivity {
     Button searchButton;
     Button nearbyButton;
     EditText queryText;
+
+
+    private GoogleMap mMap;
+    Poi poi;
 
     private PoiViewModel mPoiViewModel;
 
@@ -118,6 +129,8 @@ public class POIMasterActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+
+
         startLocationUpdates();
         //placesList.add(new Poi("123", "Name", 0.0, 0.0, "Address", "0544320000", "http://goggle.com", 4.0f));
         String query = getLastSearch(this);
@@ -140,13 +153,18 @@ public class POIMasterActivity extends AppCompatActivity {
         });
 
         LocationUtils locationutils = new LocationUtils(getApplicationContext());
-
-        if (findViewById(R.id.item_detail_container) != null) {
+        if (findViewById(R.id.map) != null) {
+       // if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
             // activity should be in two-pane mode.
+
             mTwoPane = true;
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            assert mapFragment != null;
+            mapFragment.getMapAsync(this);
         }
         myContext = this;
         recyclerView = findViewById(R.id.item_list);
@@ -165,7 +183,6 @@ public class POIMasterActivity extends AppCompatActivity {
                 adapter.setData(pois);
             }
         });
-
     }
 
     // Trigger new location updates at interval
@@ -375,4 +392,37 @@ public class POIMasterActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        if (this.poi!=null) {
+            // Add a marker in Sydney and move the camera
+            LatLng telAviv = new LatLng(poi.lat, poi.lng);
+            mMap.addMarker(new MarkerOptions().position(telAviv).title(poi.name));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(telAviv, 16));
+            // Zoom in, animating the camera.
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(18), 2000, null);
+        }
+    }
+
+    public void updateMap() {
+        if (this.poi!=null) {
+            // Add a marker in Sydney and move the camera
+            LatLng telAviv = new LatLng(poi.lat, poi.lng);
+            mMap.addMarker(new MarkerOptions().position(telAviv).title(poi.name));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(telAviv, 16));
+            // Zoom in, animating the camera.
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(18), 2000, null);
+        }
+    }
 } // POIListActivity :-}8

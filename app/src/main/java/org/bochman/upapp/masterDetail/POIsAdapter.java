@@ -130,13 +130,15 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         Poi item = (Poi) view.getTag();
         if (mTwoPane) {
             // replace the current fragment with a new fragment with required item.
-            Bundle arguments = new Bundle();
-            arguments.putParcelable(POIDetailFragment.ARG_ITEM_ID, Parcels.wrap(item) );
-            POIDetailFragment fragment = new POIDetailFragment();
-            fragment.setArguments(arguments);
-            mParentActivity.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.item_detail_container, fragment)
-                    .commit();
+            mParentActivity.poi=item;
+            mParentActivity.updateMap();
+//            Bundle arguments = new Bundle();
+//            arguments.putParcelable(POIDetailFragment.ARG_ITEM_ID, Parcels.wrap(item) );
+//            POIDetailFragment fragment = new POIDetailFragment();
+//            fragment.setArguments(arguments);
+//            mParentActivity.getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.item_detail_container, fragment)
+//                    .commit();
         } else {
             // pass the item to POIDetailActivity with the intent.
             Context context = view.getContext();
