@@ -34,10 +34,6 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <activity
-            android:name=".MapActivity"
-            android:label="@string/title_activity_places_detail" />
-
-        <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
