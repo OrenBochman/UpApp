@@ -34,6 +34,7 @@ import org.parceler.Parcels;
 public class POIDetailActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    public static final String ARG_ITEM_ID = "item_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +70,8 @@ public class POIDetailActivity extends FragmentActivity implements OnMapReadyCal
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            poi = Parcels.unwrap( getIntent().getParcelableExtra(POIDetailFragment.ARG_ITEM_ID));
+            poi = Parcels.unwrap( getIntent().getParcelableExtra(POIDetailActivity.ARG_ITEM_ID));
 
-//            POIDetailFragment fragment = new POIDetailFragment();
-//            fragment.setArguments(arguments);
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.item_detail_container, fragment)
-//                    .commit();
         }
     }
 

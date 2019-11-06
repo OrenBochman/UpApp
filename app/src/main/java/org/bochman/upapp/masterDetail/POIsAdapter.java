@@ -132,18 +132,12 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
             // replace the current fragment with a new fragment with required item.
             mParentActivity.poi=item;
             mParentActivity.updateMap();
-//            Bundle arguments = new Bundle();
-//            arguments.putParcelable(POIDetailFragment.ARG_ITEM_ID, Parcels.wrap(item) );
-//            POIDetailFragment fragment = new POIDetailFragment();
-//            fragment.setArguments(arguments);
-//            mParentActivity.getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.item_detail_container, fragment)
-//                    .commit();
+
         } else {
             // pass the item to POIDetailActivity with the intent.
             Context context = view.getContext();
             Intent intent = new Intent(context, POIDetailActivity.class);
-            intent.putExtra(POIDetailFragment.ARG_ITEM_ID, Parcels.wrap(item) );
+            intent.putExtra(POIDetailActivity.ARG_ITEM_ID, Parcels.wrap(item) );
 
             context.startActivity(intent);
         }
