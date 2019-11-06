@@ -3,15 +3,19 @@ package org.bochman.upapp.masterDetail;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.bochman.upapp.favourites.FavouritesActivity;
@@ -149,11 +153,46 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     private final View.OnLongClickListener mOnLongClickListener = view -> {
         Log.i(Debug.getTag(), "OnLongClick");
         Poi item = (Poi) view.getTag();
-        // add to favourites by passing the item's with the intent.
-        Context context = view.getContext();
-        Intent intent = new Intent(context, FavouritesActivity.class);
-        intent.putExtra(FavouritesActivity.POI_KEY, Parcels.wrap(item) );
-        context.startActivity(intent);
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(mParentActivity,view);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.options_menu);
+        //adding click listener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.favourite:                //bookmark
+                        //handle menu1 click
+                        // add to favourites by passing the item's with the intent.
+                        Context context = view.getContext();
+                        Intent intent = new Intent(context, FavouritesActivity.class);
+                        intent.putExtra(FavouritesActivity.POI_KEY, Parcels.wrap((Poi) view.getTag()) );
+                        context.startActivity(intent);
+
+                        break;
+                    case R.id.share:
+                        // share poi as text using whatapp!
+
+                        Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+                        whatsappIntent.setType("text/plain");
+                        whatsappIntent.setPackage("com.whatsapp");
+                        whatsappIntent.putExtra(Intent.EXTRA_TEXT, ("UpApp Location := "+ view.getTag().toString()));
+                        try {
+                            mParentActivity.startActivity(whatsappIntent);
+                        } catch (android.content.ActivityNotFoundException ex) {
+                            Toast.makeText(mParentActivity, R.string.app_not_installed,Toast.LENGTH_LONG).show();
+                        }
+                        break;
+                }
+                return false;
+            }
+        });
+        //displaying the popup
+        popup.show();
+
+
         return true;
     };
 
