@@ -2,6 +2,7 @@ package org.bochman.upapp.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,17 +15,32 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import org.bochman.upapp.R;
 import org.bochman.upapp.data.repository.PoiRepository;
+import org.bochman.upapp.databinding.ActivtySettingsBinding;
 import org.bochman.upapp.masterDetail.POIMasterActivity;
 
 import java.util.Objects;
 
+/**
+ * JetPack settings is replacing deprecated preferences.
+ */
 public class SettingsActivity extends AppCompatActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+
+    /** JetPack ViewBinding */
+    private ActivtySettingsBinding activtySettingsBinding;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activty_settings);
+
+        // JetPack ViewBinding based inflation
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        activtySettingsBinding = ActivtySettingsBinding.inflate(layoutInflater);
+        setContentView(activtySettingsBinding.getRoot());
+
+
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.settings_container, new SettingsFragment())
@@ -63,7 +79,7 @@ public class SettingsActivity extends AppCompatActivity implements
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-        Preference DeleteFavouritesPreference= findPreference("delete_favourites");
+            Preference DeleteFavouritesPreference= findPreference("delete_favourites");
 
             assert DeleteFavouritesPreference != null;
             DeleteFavouritesPreference.setOnPreferenceClickListener(preference -> {
