@@ -38,7 +38,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/business_type">
-        <ListPreference
+        <MultiSelectListPreference
             app:entries="@array/place_type"
             app:entryValues="@array/place_type_values"
             app:key="place_type"
