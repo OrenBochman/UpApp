@@ -15,7 +15,6 @@ class FavouritesViewHolder extends RecyclerView.ViewHolder {
     final TextView mAddressView;
     final TextView mDistance;
     final ImageView mPhoto;
-    final Button mButton;
     public RatingBar ratingBar;
 
     FavouritesViewHolder(View view) {
@@ -24,7 +23,6 @@ class FavouritesViewHolder extends RecyclerView.ViewHolder {
         mAddressView = view.findViewById(R.id.address);
         mDistance=view.findViewById(R.id.distance);
         mPhoto=view.findViewById(R.id.photo);
-        mButton=view.findViewById(R.id.share);
         ratingBar =view.findViewById(R.id.rating);
         //favourite button and share.
 
