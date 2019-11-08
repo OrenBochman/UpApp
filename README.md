@@ -62,3 +62,4 @@ Modern development relies on databases like:
 
 * [any layout manager for ConstraintLayout?](https://stackoverflow.com/questions/37803180/any-layout-manager-for-constraintlayout)
 * [Android IllegalStateException No instrumentation registered! Must run under a registering instrumentation](https://stackoverflow.com/questions/32957741/android-illegalstateexception-no-instrumentation-registered-must-run-under-a-re)
+* [Unit Testing Asynchronous Tasks from Bolts-Android](https://medium.com/@trionkidnapper/unit-testing-asynchronous-tasks-from-bolts-android-e780f02bf1be)
