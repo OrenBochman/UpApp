@@ -1,5 +1,6 @@
 package org.bochman.upapp.api;
 
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 
@@ -9,6 +10,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.bochman.upapp.BuildConfig;
+import org.bochman.upapp.R;
 import org.bochman.upapp.data.enteties.Poi;
 
 import java.util.Arrays;
@@ -29,6 +31,7 @@ public class PlaceApi {
         //init places
         Places.initialize(ctx, BuildConfig.google_maps_key);
         placesClient = Places.createClient(ctx);
+
     }
 
     /**
@@ -70,7 +73,7 @@ public class PlaceApi {
         return null;
     }
 
-    public String getHelloWorldString() {
-        return null;
+    public String getShareString(Context ctx) {
+        return ctx.getResources().getString(R.string.share);
     }
 }

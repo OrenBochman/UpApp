@@ -13,7 +13,7 @@ public class PlaceApiTest {
 
     private Context context = ApplicationProvider.getApplicationContext();
 
-    private static final String FAKE_STRING = "HELLO_WORLD";
+    private static final String FAKE_STRING = "Share";
 
     @Test
     public void readStringFromContext_LocalizedString() {
@@ -21,7 +21,7 @@ public class PlaceApiTest {
         PlaceApi myObjectUnderTest = new PlaceApi(context);
 
         // ...when the string is returned from the object under test...
-        String result = myObjectUnderTest.getHelloWorldString();
+        String result = myObjectUnderTest.getShareString(context);
 
         // ...then the result should be the expected one.
         assertThat(result).isEqualTo(FAKE_STRING);
