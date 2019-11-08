@@ -3,6 +3,9 @@ package org.bochman.upapp.api;
 import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -14,6 +17,7 @@ import org.robolectric.RobolectricTestRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -82,18 +86,28 @@ public class PlaceApiTest {
 
         assertThat(new ArrayList<>(), IsEmptyCollection.empty());
 
-
     }
+
     @Test
     public void findCurrentLocation() throws ExecutionException, InterruptedException {
-        PlaceApi myObjectUnderTest = new PlaceApi(context);
-        CompletableFuture<List<Poi>> actual = myObjectUnderTest.findCurrentLocation();
-        org.hamcrest.MatcherAssert.assertThat(actual.get(), not(IsEmptyCollection.empty()));
+        PlaceApi mPlaceApi = new PlaceApi(context);
+
+        Task<FindCurrentPlaceResponse> task = mPlaceApi.findCurrentLocation();
+
+        task.wait( 10000,5);
+
+        if(task.getResult()!=null) {
+
+            List<PlaceLikelihood> actual = task.getResult().getPlaceLikelihoods();
+            org.hamcrest.MatcherAssert.assertThat(actual, not(IsEmptyCollection.empty()));
+
+        }
 
     }
 
     @Test
     public void getPhoto() {
+
     }
 
     @Test

@@ -71,8 +71,7 @@ public class PoiIntentService extends IntentService {
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
             placeResponse.addOnCompleteListener(task -> {
                 /// do this in another thread
