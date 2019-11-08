@@ -19,7 +19,7 @@ Some Features:
 * Overriding the application object.
 * IntentService to handle api requests off the main thread.
 * BroadcastReceiver to check for connectivity.
-
+* Testing google places api asynchronously as a JUnit integration tests 
 
 Some patterns in use :
 
@@ -47,6 +47,7 @@ The following information & code snippets proved useful:
 * [Multiple tables with same type of objects in Room database](https://stackoverflow.com/questions/48279481/multiple-tables-with-same-type-of-objects-in-room-database)
 * [data doesn't show up on recyclerview - got error No layout manager attached; skipping layout](https://stackoverflow.com/questions/51359950/data-doesnt-show-up-on-recyclerview-got-error-no-layout-manager-attached-ski)
 * [How to share text to WhatsApp from my app?](https://stackoverflow.com/questions/12952865/how-to-share-text-to-whatsapp-from-my-app)
+* [converting Java bitmap to byte array](https://stackoverflow.com/questions/4989182/converting-java-bitmap-to-byte-array)
 
 Others were less useful
 
