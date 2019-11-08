@@ -2,10 +2,12 @@ package org.bochman.upapp.masterDetail;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -46,6 +48,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -232,7 +235,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
 //    /**
-//     * TODO: reomve this method.
+//     * TODO: remove this method.
 //     *
 //     * @param query
 //     */
@@ -301,7 +304,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             PoiSearchQuery();
         } else {
-            Log.e(Debug.getTag(), "permissions not granted - getting permission");
+            Log.e(Debug.getTag(), "ACCESS_FINE_LOCATION permissions is not granted - asking for permission");
 
             getLocationPermission(ACCESS_FINE_LOCATION);
         }
@@ -314,25 +317,39 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+    //// Permissions //////////////////////////////////////////////////////////////////////////////
 
+    /** make a permission request
+     *
+     * @param Permission - permission like ACCESS_FINE_LOCATION
+     */
 
-    final String accessFineLocation = ACCESS_FINE_LOCATION;
-    //get permission for
     void getLocationPermission(String Permission) {
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Permission) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(Debug.getTag(), "Permission not granted !");
+            Log.e(Debug.getTag(), String.format("getLocationPermission() - Permission %s not granted !",Permission));
             // Permission is not granted
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Permission)) {
-                Log.e(Debug.getTag(), "Permission not granted and explanation required for permission");
+                Log.e(Debug.getTag(),  String.format("Permission %s not granted - explanation required",Permission));
+                showMessageOKCancel("The app needs location access to find near by places.",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    requestPermissions(new String[]{ACCESS_FINE_LOCATION},
+                                            LOCATION_PERMISSION_REQUEST_CODE);
+                                }
+                            }
+                        });
+
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
             } else {
                 // No explanation needed; request the permission
-                Log.e(Debug.getTag(), "Permission not granted but no explanation required for permission request");
+                Log.e(Debug.getTag(), String.format("Permission %s not granted - explanation not required",Permission));
                 ActivityCompat.requestPermissions(this, new String[]{Permission}, LOCATION_PERMISSION_REQUEST_CODE);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
@@ -348,6 +365,16 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(POIMasterActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+
     /** callback for permission requests */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -356,6 +383,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
                     permissions[0].equals(ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //do the search again!
+                Log.e(Debug.getTag(), String.format("Permission %s granted - running search",ACCESS_FINE_LOCATION));
                 PoiSearchQuery();
             } else {
                 Log.e(Debug.getTag(), "permissions.length=" + permissions.length);
@@ -365,6 +393,8 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
             }
         }
     }
+
+    //// END Permissions Section //////////////////////////////////////////////////////////////////
 
     /**
      * handle menu events.

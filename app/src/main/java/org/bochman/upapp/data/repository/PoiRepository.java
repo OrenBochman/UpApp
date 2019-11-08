@@ -3,8 +3,10 @@ package org.bochman.upapp.data.repository;
 import android.app.Application;
 import android.os.AsyncTask;
 
+import org.bochman.upapp.data.dao.PlacePhotoDao;
 import org.bochman.upapp.data.dao.PoiDao;
 import org.bochman.upapp.data.db.PoiDatabase;
+import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.enteties.Poi;
 
 import java.util.List;
@@ -14,12 +16,14 @@ import androidx.lifecycle.LiveData;
 public class PoiRepository {
 
     private PoiDao mPoiDao;
+    private PlacePhotoDao mPlacePhotoDao;
     private LiveData<List<Poi>> mAllPois;
     private LiveData<List<Poi>> mAllFavs;
 
     public PoiRepository(Application application) {
         PoiDatabase db = PoiDatabase.getDatabase(application);
         mPoiDao = db.poiDao();
+        mPlacePhotoDao= db.placePhotoDao();
         mAllPois = mPoiDao.getAllPlaces();
         mAllFavs = mPoiDao.getAllFavourites();
     }
@@ -32,6 +36,19 @@ public class PoiRepository {
         return mAllFavs;
     }
 
+    public PlacePhoto getPhoto(String id){
+        return mPlacePhotoDao.getPhoto(id);
+    }
+
+    public void insertPhoto (PlacePhoto placePhoto) {
+
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                mPlacePhotoDao.insertPhoto(placePhoto);
+            }
+        }).start();
+    }
 
     public void delete(String id) {
         new Thread(new Runnable(){
@@ -41,6 +58,7 @@ public class PoiRepository {
             }
         }).start();
     }
+
     public void deleteAllPois() {
         new Thread(new Runnable(){
             @Override
