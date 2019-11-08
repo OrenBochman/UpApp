@@ -2,7 +2,7 @@
 
 Android Capstone Project.
 
-Some Features:
+## Some Features:
 
 * MVVM architecture
 * live data + observable for updates
@@ -21,7 +21,7 @@ Some Features:
 * BroadcastReceiver to check for connectivity.
 * Testing google places api asynchronously as a JUnit integration tests 
 
-Some patterns in use :
+## Some patterns in use :
 
 * Model View ViewMode (MVVM)
 * viewHolder patten
@@ -31,8 +31,15 @@ Some patterns in use :
 
 # References
 
-Modern development relies on databases like stackoverflow.
-The following information & code snippets proved useful:
+Modern development relies on databases like:
+ 
+ * StackOverflow, 
+ * code path, 
+ * android developer docs.
+ * google maps/places api documentation.
+ * blogposts.
+
+## The following information & code snippets proved useful:
 
 * [How to use vector drawables in Android API lower 21?](https://stackoverflow.com/questions/34417843/how-to-use-vector-drawables-in-android-api-lower-21/34417988)
 * [Please provide a Migration in the builder or call fallbackToDestructiveMigration in the builder in which case Room will re-create all of the tables](https://stackoverflow.com/questions/49629656/please-provide-a-migration-in-the-builder-or-call-fallbacktodestructivemigration)
@@ -48,7 +55,10 @@ The following information & code snippets proved useful:
 * [data doesn't show up on recyclerview - got error No layout manager attached; skipping layout](https://stackoverflow.com/questions/51359950/data-doesnt-show-up-on-recyclerview-got-error-no-layout-manager-attached-ski)
 * [How to share text to WhatsApp from my app?](https://stackoverflow.com/questions/12952865/how-to-share-text-to-whatsapp-from-my-app)
 * [converting Java bitmap to byte array](https://stackoverflow.com/questions/4989182/converting-java-bitmap-to-byte-array)
+* [How to use git branch with Android Studio](https://stackoverflow.com/questions/24657326/how-to-use-git-branch-with-android-studio)
+* [Missing org/apache/http/client/methods/HttpUriRequest on Android app](https://stackoverflow.com/questions/46283831/missing-org-apache-http-client-methods-httpurirequest-on-android-app)
 
-Others were less useful
+## Others were less useful 
 
 * [any layout manager for ConstraintLayout?](https://stackoverflow.com/questions/37803180/any-layout-manager-for-constraintlayout)
+* [Android IllegalStateException No instrumentation registered! Must run under a registering instrumentation](https://stackoverflow.com/questions/32957741/android-illegalstateexception-no-instrumentation-registered-must-run-under-a-re)
