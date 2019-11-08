@@ -42,10 +42,12 @@ The following information & code snippets proved useful:
 * [Android Room with a View CodeLab](https://codelabs.developers.google.com/codelabs/android-room-with-a-view)
 * [How to ask for location permission in Android Studio?](https://stackoverflow.com/questions/57098852/how-to-ask-for-location-permission-in-android-studio)
 * [Requesting App permissions](https://developer.android.com/training/permissions/requesting)
+* [How to customise permission request](https://www.journaldev.com/10409/android-runtime-permissions-example#requesting-android-runtime-permissions)
 * [Android: Stop/Start service depending on WiFi state?](https://stackoverflow.com/questions/7094606/android-stop-start-service-depending-on-wifi-state)
 * [Multiple tables with same type of objects in Room database](https://stackoverflow.com/questions/48279481/multiple-tables-with-same-type-of-objects-in-room-database)
 * [data doesn't show up on recyclerview - got error No layout manager attached; skipping layout](https://stackoverflow.com/questions/51359950/data-doesnt-show-up-on-recyclerview-got-error-no-layout-manager-attached-ski)
 * [How to share text to WhatsApp from my app?](https://stackoverflow.com/questions/12952865/how-to-share-text-to-whatsapp-from-my-app)
+
 Others were less useful
 
 * [any layout manager for ConstraintLayout?](https://stackoverflow.com/questions/37803180/any-layout-manager-for-constraintlayout)
