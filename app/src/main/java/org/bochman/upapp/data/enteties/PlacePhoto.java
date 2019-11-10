@@ -3,6 +3,7 @@ package org.bochman.upapp.data.enteties;
 import android.graphics.Bitmap;
 
 import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -23,4 +24,10 @@ public class PlacePhoto {
     public String id;
     @ColumnInfo
     public Bitmap bitmap;
+
+    @ParcelConstructor
+    public PlacePhoto(@NonNull String id, Bitmap bitmap) {
+        this.id = id;
+        this.bitmap = bitmap;
+    }
 }
