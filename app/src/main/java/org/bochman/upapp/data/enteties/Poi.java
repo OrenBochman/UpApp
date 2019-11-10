@@ -3,6 +3,8 @@ package org.bochman.upapp.data.enteties;
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
 
+import java.util.Date;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -32,12 +34,15 @@ public class Poi {
     @ColumnInfo
     public String website;
     @ColumnInfo
-    public Integer isFavourite;  //1 is favourite 0 is not
+    public Integer isFavourite;  // 1 is favourite 0 is not
+    @ColumnInfo
+    public Integer isDeleted;    // 1 is deleted 0 is not
     @ColumnInfo
     public double  rating;
     @ColumnInfo
     public String photoUri;
-
+    @ColumnInfo
+    public Date timeStamp;
 
 //
 //    public Poi(String id, String name, String address, double lat, double lng){
@@ -57,9 +62,12 @@ public class Poi {
         this.address = address;
         this.phone = phone;
         this.website = website;
-        this.isFavourite = 0;
         this.rating = rating;
         this.photoUri="";
+        this.isFavourite = 0;
+        this.isDeleted = 0;
+        //this.timeStamp = 0;
+
     }
 
     @Override
@@ -106,8 +114,9 @@ public class Poi {
                 ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", website='" + website + '\'' +
-                ", isFavourite=" + isFavourite +
-                ", rating=" + rating +
+                ", isFavourite='" + isFavourite + '\'' +
+                ", isDeleted='" + isDeleted + '\'' +
+                ", rating=" + rating +  '\'' +
                 ", photoUri='" + photoUri + '\'' +
                 '}';
     }
