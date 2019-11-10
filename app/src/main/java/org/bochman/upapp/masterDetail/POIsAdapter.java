@@ -2,6 +2,7 @@ package org.bochman.upapp.masterDetail;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -18,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.favourites.FavouritesActivity;
 import org.bochman.upapp.R;
 import org.bochman.upapp.utils.Debug;
@@ -26,6 +28,7 @@ import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.SpUtils;
 import org.parceler.Parcels;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,6 +42,8 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
 
     // cached copy of poi data.
     private  List<Poi> mValues;
+    // cached copy of place photos.
+    private HashMap<String,Bitmap> mPhotos;
     // cache for the current location - updated whenever the data is updated.
     private LatLng latlng;
     // cache of flag indicating if master and detail are in the same activity.
@@ -53,11 +58,12 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
      * @param items - poi data.
      * @param twoPane - flag indicating if master and detail are in the same activity.
      */
-    public POIsAdapter(POIMasterActivity parent, List<Poi> items, boolean twoPane) {
+    public POIsAdapter(POIMasterActivity parent, List<Poi> items, HashMap<String, Bitmap> mPhotos, boolean twoPane) {
 
         this.mValues = items;
         this.mParentActivity = parent;
         this.mTwoPane = twoPane;
+        this.mPhotos = mPhotos;
         getLatLng();
 
     } // SimpleItemRecyclerViewAdapter [:-}~
@@ -82,17 +88,26 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
                         new LatLng(poi.lat,poi.lng),
                         SpUtils.getIsMetric(mParentActivity.getApplicationContext())==1));
 
+        Bitmap bitmap=mPhotos.get(poi.id);
 
+        if(bitmap==null){
+            holder.mPhoto.setImageDrawable(mParentActivity.getResources().getDrawable(R.drawable.ic_photo_black_24));
+            Log.i(Debug.getTag(),String.format("Bitmap %s is  null",poi.id));
+        }else{
+            holder.mPhoto.setImageBitmap(bitmap);
+            Log.i(Debug.getTag(),String.format("Bitmap %s is  size: ",bitmap.getHeight()*bitmap.getWidth()));
 
-        if (holder.mPhoto != null)
-            if( poi.photoUri!=null && !poi.photoUri.isEmpty()) {
-            Picasso
-                    .get()
-                    .load(poi.photoUri)
-                    .into(holder.mPhoto);
-            }else{
-                holder.mPhoto.setImageDrawable(mParentActivity.getResources().getDrawable(R.drawable.ic_photo_black_24));
-            }
+        }
+
+//        if (holder.mPhoto != null)
+//            if( poi.photoUri!=null && !poi.photoUri.isEmpty()) {
+//            Picasso
+//                    .get()
+//                    .load(poi.photoUri)
+//                    .into(holder.mPhoto);
+//            }else{
+//                holder.mPhoto.setImageDrawable(mParentActivity.getResources().getDrawable(R.drawable.ic_photo_black_24));
+//            }
 
 
         holder.itemView.setTag(poi);
@@ -109,9 +124,15 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     public void setData(List<Poi> data){
         mValues = data;
         getLatLng();
+        Log.e(Debug.getTag(), String.format("setData: length %d ", data.size()));
         notifyDataSetChanged();
     }
 
+    public void setPhotos(HashMap<String,Bitmap> photos) {
+        mPhotos = photos;
+        Log.e(Debug.getTag(), String.format("setPhotos: length %d ", photos.size()));
+        notifyDataSetChanged();
+    }
 
 
     // getItemCount() is called many times, and when it is first called,
@@ -191,8 +212,6 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         });
         //displaying the popup
         popup.show();
-
-
         return true;
     };
 
@@ -205,5 +224,6 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         latlng=new LatLng(SpUtils.getLat(mParentActivity.getApplicationContext()),
                 SpUtils.getLng(mParentActivity.getApplicationContext()));
     }
+
 
 } // POIsAdapter :-}8
