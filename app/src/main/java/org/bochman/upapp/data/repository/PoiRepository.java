@@ -1,8 +1,11 @@
 package org.bochman.upapp.data.repository;
 
 import android.app.Application;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.graphics.Bitmap;
 
+import org.bochman.upapp.api.HttpPoiSearchIntentService;
+import org.bochman.upapp.api.PhotoIntentService;
 import org.bochman.upapp.data.dao.PlacePhotoDao;
 import org.bochman.upapp.data.dao.PoiDao;
 import org.bochman.upapp.data.db.PoiDatabase;
@@ -23,7 +26,7 @@ public class PoiRepository {
     public PoiRepository(Application application) {
         PoiDatabase db = PoiDatabase.getDatabase(application);
         mPoiDao = db.poiDao();
-        mPlacePhotoDao= db.placePhotoDao();
+        mPlacePhotoDao = db.placePhotoDao();
         mAllPois = mPoiDao.getAllPlaces();
         mAllFavs = mPoiDao.getAllFavourites();
     }
@@ -36,64 +39,28 @@ public class PoiRepository {
         return mAllFavs;
     }
 
-    public PlacePhoto getPhoto(String id){
+    public Bitmap getPhoto(String id) {
         return mPlacePhotoDao.getPhoto(id);
     }
 
-    public void insertPhoto (PlacePhoto placePhoto) {
-
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                mPlacePhotoDao.insertPhoto(placePhoto);
-            }
-        }).start();
+    public void insertPhoto(PlacePhoto placePhoto) {
+        new Thread(() -> mPlacePhotoDao.insertPhoto(placePhoto)).start();
     }
 
     public void delete(String id) {
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                mPoiDao.delete(id);
-            }
-        }).start();
+        new Thread(() -> mPoiDao.delete(id)).start();
     }
 
     public void deleteAllPois() {
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                mPoiDao.deleteAllPoi();
-            }
-        }).start();
+        new Thread(() -> mPoiDao.deleteAllPoi()).start();
     }
 
     public void deleteAllFavourites() {
-
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                mPoiDao.deleteAllFavourites();
-            }
-        }).start();
+        new Thread(() -> mPoiDao.deleteAllFavourites()).start();
     }
 
-    public void insert (Poi Poi) {
-        new insertAsyncTask(mPoiDao).execute(Poi);
-    }
+    public void insert(Poi poi) {
+        new Thread(() -> mPoiDao.insert(poi)).start();
 
-    private static class insertAsyncTask extends AsyncTask<Poi, Void, Void> {
-
-        private PoiDao mAsyncTaskDao;
-
-        insertAsyncTask(PoiDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final Poi... params) {
-            mAsyncTaskDao.insert(params[0]);
-            return null;
-        }
     }
 }
