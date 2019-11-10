@@ -1,5 +1,7 @@
 package org.bochman.upapp.data.dao;
 
+import android.graphics.Bitmap;
+
 import org.bochman.upapp.data.enteties.PlacePhoto;
 
 import androidx.room.Dao;
@@ -11,8 +13,8 @@ import androidx.room.Query;
 @Dao
 public interface PlacePhotoDao {
 
-    @Query("Select * From PlacePhoto where id = :id")
-    PlacePhoto getPhoto(String id);
+    @Query("Select bitmap From PlacePhoto where id = :id")
+    Bitmap getPhoto(String id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insertPhoto(PlacePhoto placePhoto);
