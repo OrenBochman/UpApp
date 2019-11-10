@@ -5,12 +5,14 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.opengl.GLDebugHelper;
 import android.os.Bundle;
 import android.util.DebugUtils;
@@ -18,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
 import org.bochman.upapp.masterDetail.POIMasterActivity;
 import org.bochman.upapp.R;
@@ -27,6 +30,7 @@ import org.bochman.upapp.data.enteties.Poi;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,14 +38,18 @@ import java.util.List;
  */
 public class FavouritesActivity extends AppCompatActivity {
 
-    /** the list of favourites. */
-    private final List<Poi> favouritesList = new ArrayList<>();
+
     FavouritesAdapter adapter;
     RecyclerView recyclerView;
     /**  the key used by POIListActivity for passing a favourite via an intent */
     public static final String POI_KEY = "POI";
 
     Poi poi;
+    /** the list of favourites. */
+    private List<Poi> favouritesList;
+    /** the hashmap of photos */
+    private HashMap<String, Bitmap> photoMap;
+    /** the view model */
     private PoiViewModel mPoiViewModel;
 
     @Override
@@ -62,22 +70,34 @@ public class FavouritesActivity extends AppCompatActivity {
         Poi poi = Parcels.unwrap(getIntent().getParcelableExtra(FavouritesActivity.POI_KEY) );
 
         Log.i(Debug.getTag(),"POI in intent is = "+ poi.toString());
-        //add poi to repo.
 
-        //fetch the list from
-        favouritesList.add(poi);
+
+        //get the view model
+        mPoiViewModel = new ViewModelProvider(this).get(PoiViewModel.class);
+        //add the new favourite to the using the view model.
+        mPoiViewModel.insert(poi);
+        //get the data from the view model
+        final LiveData<List<PlacePhoto>> favImages = mPoiViewModel.getFavImages();
+        if(favImages.getValue() != null) {
+            photoMap = convertToHashmap(favImages.getValue());
+        }else{
+            photoMap= new HashMap<>();
+        }
+        final LiveData<List<Poi>> allFavs = mPoiViewModel.getAllFavs();
+        if(favImages.getValue() != null) {
+            favouritesList = allFavs.getValue();
+        }else{
+            favouritesList=new ArrayList<>();
+        }
 
         recyclerView = findViewById(R.id.favouritesRecyclerView);
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FavouritesAdapter(this, favouritesList);
+        adapter = new FavouritesAdapter(this, favouritesList,photoMap);
         recyclerView.setAdapter(adapter);
 
-        // get the ViewModel and observe changes to the favourites list
 
-        mPoiViewModel = new ViewModelProvider(this).get(PoiViewModel.class);
-        mPoiViewModel.delete(poi.id);
-        mPoiViewModel.getAllFavs().observe(this, new Observer<List<Poi>>() {
+        allFavs.observe(this, new Observer<List<Poi>>() {
             @Override
             public void onChanged(@Nullable final List<Poi> pois) {
                 // Update the cached copy of the words in the adapter.
@@ -86,11 +106,27 @@ public class FavouritesActivity extends AppCompatActivity {
             }
         });
 
-        poi.isFavourite=1;
-        mPoiViewModel.insert(poi);
+        //observe the photos for changes
+        favImages.observe(this, new Observer<List<PlacePhoto>>() {
+            @Override
+            public void onChanged(@Nullable final List<PlacePhoto> photos) {
+                // Update the cached copy of the words in the adapter.
+                adapter.setPhotos(convertToHashmap(photos));
+            }
+        });
 
+
+        poi.isFavourite=1;
+        mPoiViewModel.update(poi);
     }
 
+    HashMap<String,Bitmap> convertToHashmap(List<PlacePhoto> photos) {
+        HashMap<String, Bitmap> photoMap = new HashMap<>();
+        for (PlacePhoto photo : photos) {
+            photoMap.put(photo.id, photo.bitmap);
+        }
+        return photoMap;
+    }
 
     /**
      * handle menu events.
@@ -100,7 +136,7 @@ public class FavouritesActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //using the same menue as master activity.
+        //using the same menu as master activity.
         getMenuInflater().inflate(R.menu.places_list_activity_menu, menu);
         MenuItem preferencesItem = menu.findItem(R.id.action_preferences);
         return true;
