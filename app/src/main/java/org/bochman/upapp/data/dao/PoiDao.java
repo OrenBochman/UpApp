@@ -9,6 +9,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 @Dao
 public interface PoiDao {
@@ -16,7 +17,7 @@ public interface PoiDao {
     @Query("Select * From Poi where id = :id")
     Poi getById(String id);
 
-    @Query("SELECT * from Poi where isFavourite = 0")
+    @Query("SELECT * from Poi where isDeleted = 0")
     LiveData<List<Poi>> getAllPlaces();
 
     @Query("SELECT * from Poi where isFavourite = 1")
@@ -25,13 +26,16 @@ public interface PoiDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insert(Poi poi);
 
-    @Query("Delete From Poi where id Like :id")
+    @Query("Update Poi set isDeleted=1 where id Like :id")
     int delete(String id);
 
-    @Query("Delete From Poi where isFavourite = 1 ")
+    @Query("Update Poi set isFavourite=0 where isFavourite = 1 ")
     int deleteAllFavourites();
 
-    @Query("Delete From Poi where isFavourite = 0 ")
+    @Query("Update Poi set isDeleted=1")
     int deleteAllPoi();
+
+    @Update
+    public int updatePoi(Poi... poi);
 
 }
