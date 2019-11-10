@@ -72,6 +72,10 @@
 
         <service android:name=".api.PoiIntentService"
             android:exported="false" />
+        <service android:name=".api.HttpPoiSearchIntentService"
+            android:exported="false" />
+        <service android:name=".api.PhotoIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>
