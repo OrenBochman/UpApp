@@ -89,27 +89,6 @@ public class HttpPoiSearchIntentService extends IntentService {
                     String phone = "phone not found"; // default in case there is no phone number
                     String website = "website not found"; // default in case there is no website
 
-                    /*
-                    Request request2 = new Request.Builder().url("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + keyword + "&fields=formatted_phone_number,website&key=" + API_KEY + "\n").build();
-
-                    Response response2 = client.newCall(request2).execute();
-
-                    if(response2.body() != null) {
-                        String result2 = response2.body().string();
-
-                        JSONObject rootObj2 = new JSONObject(result2);
-                        JSONObject obj = rootObj2.getJSONObject("result");
-
-                        if (obj.has("formatted_phone_number")) { // check if there is a phone number
-                            phone = obj.getString("formatted_phone_number");
-                        }
-
-                        if (obj.has("website")) { // check if there is a website
-                            website = obj.getString("website");
-                        }
-                    }
-
-                     */
                     Log.i(TAG, "Parsing done: ");
 
                     // insert the search results to DB
