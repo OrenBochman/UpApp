@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.bochman.upapp.R;
 import org.bochman.upapp.api.HttpPoiSearchIntentService;
 import org.bochman.upapp.api.PoiIntentService;
+import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
 import org.bochman.upapp.settings.SettingsActivity;
@@ -43,6 +45,7 @@ import org.bochman.upapp.utils.SpUtils;
 import org.bochman.upapp.wifi.ConnectivityWatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -77,6 +80,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
      * the list of places of interest
      */
     private final List<Poi> placesList = new ArrayList<>();
+    private HashMap<String,Bitmap> photoMap =new HashMap<>();
     POIsAdapter adapter;                    // the places adapter
     RecyclerView recyclerView;
 
@@ -88,7 +92,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
     private GoogleMap mMap;
     Poi poi;
 
-    private PoiViewModel mPoiViewModel;
+    PoiViewModel mPoiViewModel;
 
     /**
      * Request code for location permission request.
@@ -175,7 +179,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new POIsAdapter(this, placesList, mTwoPane);
+        adapter = new POIsAdapter(this, placesList,photoMap, mTwoPane);
         recyclerView.setAdapter(adapter);
 
         // get the ViewModel and observe changes to the poi list
@@ -185,6 +189,18 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
             public void onChanged(@Nullable final List<Poi> pois) {
                 // Update the cached copy of the words in the adapter.
                 adapter.setData(pois);
+            }
+        });
+
+        mPoiViewModel.getAllImages().observe(this, new Observer<List<PlacePhoto>>() {
+            @Override
+            public void onChanged(@Nullable final List<PlacePhoto> photos) {
+                // Update the cached copy of the words in the adapter.
+                HashMap<String, Bitmap> photoMap= new HashMap<>();
+                for(PlacePhoto photo:photos){
+                    photoMap.put(photo.id,photo.bitmap);
+                }
+                adapter.setPhotos(photoMap);
             }
         });
     }
