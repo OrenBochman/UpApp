@@ -70,6 +70,8 @@
 
         <receiver android:name=".wifi.ConnectivityWatcher" />
 
+        <receiver android:name=".power.PowerWatcher" />
+
         <service android:name=".api.PoiIntentService"
             android:exported="false" />
         <service android:name=".api.HttpPoiSearchIntentService"

@@ -10,7 +10,7 @@ import android.net.NetworkInfo;
 import android.widget.Toast;
 
 /**
- * A Broadcastreciever that watches for network changes
+ * A Broadcastreciever that watches for network changes & shows toasts
  */
 public class ConnectivityWatcher extends BroadcastReceiver {
     @Override

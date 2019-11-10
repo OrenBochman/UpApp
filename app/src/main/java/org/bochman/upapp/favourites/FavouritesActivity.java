@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.opengl.GLDebugHelper;
 import android.os.Bundle;
@@ -24,14 +25,19 @@ import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
 import org.bochman.upapp.masterDetail.POIMasterActivity;
 import org.bochman.upapp.R;
+import org.bochman.upapp.power.PowerWatcher;
 import org.bochman.upapp.settings.SettingsActivity;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.data.enteties.Poi;
+import org.bochman.upapp.wifi.ConnectivityWatcher;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.bochman.upapp.utils.SpUtils.getLastSearch;
+import static org.bochman.upapp.utils.SpUtils.setLastSearch;
 
 /**
  * An activity representing a list of Favourites.
@@ -171,6 +177,45 @@ public class FavouritesActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+
+    /**
+     * resume lifecycle handler
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        //Feature start charging monitoring service
+        IntentFilter ifilter =new IntentFilter();
+        ifilter.addAction(Intent.ACTION_POWER_CONNECTED);
+        ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        ifilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(powerWatcher, ifilter);
+
+        //Feature start wifi monitoring service - will not work for api >= 28 pie
+        registerReceiver(connectivityWatcher, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+
+    }
+
+    /**
+     *
+     */
+    private ConnectivityWatcher connectivityWatcher = new ConnectivityWatcher();
+    private PowerWatcher powerWatcher = new PowerWatcher();
+
+    /**
+     * pause lifecycle handler
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+
+
+        //Feature: suspend wifi monitoring service
+        unregisterReceiver(connectivityWatcher);
+        unregisterReceiver(powerWatcher);
     }
 
 }

@@ -37,6 +37,7 @@ import org.bochman.upapp.api.PoiIntentService;
 import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
+import org.bochman.upapp.power.PowerWatcher;
 import org.bochman.upapp.settings.SettingsActivity;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
@@ -271,7 +272,6 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
 
     /**
      * resume lifecycle handler
-     * Non-MVP-TODO: test onResume.
      */
     @Override
     public void onResume() {
@@ -280,18 +280,26 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
         // Feature: restoring saved search.
         queryText.setText(getLastSearch(this));
 
+        //Feature start charging monitoring service
+        IntentFilter ifilter =new IntentFilter();
+        ifilter.addAction(Intent.ACTION_POWER_CONNECTED);
+        ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        ifilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(powerWatcher, ifilter);
+
         //Feature start wifi monitoring service - will not work for api >= 28 pie
         registerReceiver(connectivityWatcher, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+
     }
 
     /**
      *
      */
     private ConnectivityWatcher connectivityWatcher = new ConnectivityWatcher();
+    private PowerWatcher powerWatcher = new PowerWatcher();
 
     /**
      * pause lifecycle handler
-     * Non-MVP-TODO: test onPause.
      */
     @Override
     public void onPause() {
@@ -302,6 +310,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
 
         //Feature: suspend wifi monitoring service
         unregisterReceiver(connectivityWatcher);
+        unregisterReceiver(powerWatcher);
     }
 
     /**
