@@ -18,7 +18,7 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 // bump version number if your schema changes
-@Database(entities = {Poi.class, PlacePhoto.class}, version =4)
+@Database(entities = {Poi.class, PlacePhoto.class}, version =5)
 @TypeConverters({BitmapConverter.class, DateConverter.class})
 
 public abstract class PoiDatabase extends RoomDatabase {
