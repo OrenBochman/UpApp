@@ -9,6 +9,7 @@ import android.widget.Toast;
 import org.bochman.upapp.BuildConfig;
 import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
+import org.bochman.upapp.data.repository.PoiRepository;
 import org.bochman.upapp.utils.SpUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,17 +33,22 @@ public class HttpPoiSearchIntentService extends IntentService {
 
     public static final String ACTION_JSON = "action_json";
     String TAG = PoiIntentService.class.getSimpleName();
+    public static final String QUERY = "query";
 
     final static String API_KEY = BuildConfig.google_maps_key;
 
+    PoiRepository mPoiRepository;
+
     public HttpPoiSearchIntentService() {
         super("SearchIntentService");
+        mPoiRepository = new PoiRepository(getApplication());
+        //mPoiRepository = ((UpApp) getApplicationContext()).getPoiRepository();
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        String keyword = intent.getStringExtra("keyword"); // gets the search keyword from intent in Results Frag
+        String keyword = intent.getStringExtra(QUERY); // gets the search keyword from intent in Results Frag
         if (keyword.equals("")) { // * for general search that returns results of all places around not by specific keyword
             keyword = "";
             Log.i(TAG, "General search");
@@ -60,13 +66,14 @@ public class HttpPoiSearchIntentService extends IntentService {
         try {
             Response response = client.newCall(request).execute();
             if (response.isSuccessful()) {
+
                 Log.i(TAG, "Parsing response");
                 String result = response.body().string();
 
                 JSONObject rootObj = new JSONObject(result);
                 JSONArray array = rootObj.getJSONArray("results");
 
-                ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().deleteAllPoi();
+                mPoiRepository.deleteAllPois();
 
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject place = array.getJSONObject(i);
@@ -79,37 +86,40 @@ public class HttpPoiSearchIntentService extends IntentService {
                     }
                     double lat = place.getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                     double lng = place.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-
-                    request = new Request.Builder().url("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + keyword + "&fields=formatted_phone_number,website&key=" + API_KEY + "\n").build();
-
-                    Response response2 = client.newCall(request).execute();
-                    String result2 = response2.body().string();
-
-                    JSONObject rootObj2 = new JSONObject(result2);
-                    JSONObject obj = rootObj2.getJSONObject("result");
-
                     String phone = "phone not found"; // default in case there is no phone number
-                    if (obj.has("formatted_phone_number")) { // check if there is a phone number
-                        phone = obj.getString("formatted_phone_number");
-                    }
-
                     String website = "website not found"; // default in case there is no website
-                    if (obj.has("website")) { // check if there is a website
-                        website = obj.getString("website");
+
+                    /*
+                    Request request2 = new Request.Builder().url("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + keyword + "&fields=formatted_phone_number,website&key=" + API_KEY + "\n").build();
+
+                    Response response2 = client.newCall(request2).execute();
+
+                    if(response2.body() != null) {
+                        String result2 = response2.body().string();
+
+                        JSONObject rootObj2 = new JSONObject(result2);
+                        JSONObject obj = rootObj2.getJSONObject("result");
+
+                        if (obj.has("formatted_phone_number")) { // check if there is a phone number
+                            phone = obj.getString("formatted_phone_number");
+                        }
+
+                        if (obj.has("website")) { // check if there is a website
+                            website = obj.getString("website");
+                        }
                     }
 
+                     */
                     Log.i(TAG, "Parsing done: ");
 
                     // insert the search results to DB
 
                     Poi poi = new Poi(placeId, name, lat, lng, address, phone, website, rating);
-                    ((UpApp) getApplicationContext()).getPoiDatabase().poiDao().insert(poi);
+                    mPoiRepository.insert(poi);
+                    getPhoto(poi);
                     Log.i(TAG, "Inserting item +" + i + "+into DB: " + poi.toString());
-                }
-                Intent broadcastIntent = new Intent(ACTION_JSON);
 
-                // send the broadcast to the receiver in Results Frag in order to notify the adapter that there are new places in the DB
-                LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+                }
 
             } else { // in case the response is unsuccessful - no results from JSON
                 Log.i(TAG, "error: no results: ");
@@ -128,5 +138,11 @@ public class HttpPoiSearchIntentService extends IntentService {
             Log.e(TAG, "JSONException", e);
             // e.printStackTrace();
         }
+    }
+
+    private void getPhoto(Poi poi) {
+        Intent photoIntent = new Intent(this, PhotoIntentService.class);
+        photoIntent.putExtra(PhotoIntentService.PLACE_ID,poi.id);
+        startService(photoIntent);
     }
 }
