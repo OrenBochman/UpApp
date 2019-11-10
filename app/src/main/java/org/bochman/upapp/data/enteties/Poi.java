@@ -40,7 +40,7 @@ public class Poi {
     @ColumnInfo
     public double  rating;
     @ColumnInfo
-    public String photoUri;
+    public String photoUri;     //content://palceid
     @ColumnInfo
     public Date timeStamp;
 
