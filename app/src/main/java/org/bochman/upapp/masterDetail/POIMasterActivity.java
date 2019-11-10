@@ -1,6 +1,5 @@
 package org.bochman.upapp.masterDetail;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationCallback;
@@ -33,6 +31,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.bochman.upapp.R;
+import org.bochman.upapp.api.HttpPoiSearchIntentService;
 import org.bochman.upapp.api.PoiIntentService;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
@@ -103,9 +102,11 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
     private boolean mPermissionDenied = false;
-    /** Flag indicating whether a the search query should be used in the search */
+    /**
+     * Flag indicating whether a the search query should be used in the search
+     */
 
-    private  boolean useQuery=false;
+    private boolean useQuery = false;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
      */
@@ -144,20 +145,20 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
         // Feature: restoring saved search.
         queryText.setText(query);
         searchButton.setOnClickListener(v -> {
-            useQuery=true;
+            useQuery = true;
             this.PoiSearch(true);
 
         });
 
         nearbyButton.setOnClickListener(v -> {
-            useQuery=false;
+            useQuery = false;
             this.PoiSearch(false);
 
         });
 
         LocationUtils locationutils = new LocationUtils(getApplicationContext());
         if (findViewById(R.id.map) != null) {
-       // if (findViewById(R.id.item_detail_container) != null) {
+            // if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
@@ -287,18 +288,31 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
         unregisterReceiver(connectivityWatcher);
     }
 
-    /** actual search request */
+    /**
+     * actual search request
+     */
     private void PoiSearchQuery() {
+        Intent intent;
+        String query;
+        if (useQuery) {
+            intent = new Intent(this, HttpPoiSearchIntentService.class);
+            query = queryText.getText().toString();
+            intent.putExtra(HttpPoiSearchIntentService.QUERY, query);
+        } else {
+            intent = new Intent(this, PoiIntentService.class);
+            query = "";
+            intent.putExtra(PoiIntentService.QUERY, query);
+        }
 
-        Intent intent = new Intent(this, PoiIntentService.class);
-        String query = useQuery ? queryText.getText().toString() : "";
-        intent.putExtra(PoiIntentService.QUERY, query);
         startService(intent);
     }
-    /** check permission and make request request */
-    protected void PoiSearch(boolean useQuery){
 
-        this.useQuery=useQuery;
+    /**
+     * check permission and make request request
+     */
+    protected void PoiSearch(boolean useQuery) {
+
+        this.useQuery = useQuery;
         hideSoftKeyBoard();
         // get places nearby
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -309,17 +323,19 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
             getLocationPermission(ACCESS_FINE_LOCATION);
         }
     }
+
     private void hideSoftKeyBoard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
-        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+        if (imm.isAcceptingText()) { // verify if the soft keyboard is open
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
 
     //// Permissions //////////////////////////////////////////////////////////////////////////////
 
-    /** make a permission request
+    /**
+     * make a permission request
      *
      * @param Permission - permission like ACCESS_FINE_LOCATION
      */
@@ -328,11 +344,11 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Permission) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(Debug.getTag(), String.format("getLocationPermission() - Permission %s not granted !",Permission));
+            Log.e(Debug.getTag(), String.format("getLocationPermission() - Permission %s not granted !", Permission));
             // Permission is not granted
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Permission)) {
-                Log.e(Debug.getTag(),  String.format("Permission %s not granted - explanation required",Permission));
+                Log.e(Debug.getTag(), String.format("Permission %s not granted - explanation required", Permission));
                 showMessageOKCancel("The app needs location access to find near by places.",
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -349,7 +365,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
                 // sees the explanation, try again to request the permission.
             } else {
                 // No explanation needed; request the permission
-                Log.e(Debug.getTag(), String.format("Permission %s not granted - explanation not required",Permission));
+                Log.e(Debug.getTag(), String.format("Permission %s not granted - explanation not required", Permission));
                 ActivityCompat.requestPermissions(this, new String[]{Permission}, LOCATION_PERMISSION_REQUEST_CODE);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
@@ -375,7 +391,9 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
 
-    /** callback for permission requests */
+    /**
+     * callback for permission requests
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {// If request is cancelled, the result arrays are empty.
@@ -383,7 +401,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
                     permissions[0].equals(ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //do the search again!
-                Log.e(Debug.getTag(), String.format("Permission %s granted - running search",ACCESS_FINE_LOCATION));
+                Log.e(Debug.getTag(), String.format("Permission %s granted - running search", ACCESS_FINE_LOCATION));
                 PoiSearchQuery();
             } else {
                 Log.e(Debug.getTag(), "permissions.length=" + permissions.length);
@@ -411,8 +429,8 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.action_preferences:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
@@ -435,7 +453,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (this.poi!=null) {
+        if (this.poi != null) {
             // Add a marker in Sydney and move the camera
             LatLng telAviv = new LatLng(poi.lat, poi.lng);
             mMap.addMarker(new MarkerOptions().position(telAviv).title(poi.name));
@@ -446,7 +464,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     public void updateMap() {
-        if (this.poi!=null) {
+        if (this.poi != null) {
             // Add a marker in Sydney and move the camera
             LatLng telAviv = new LatLng(poi.lat, poi.lng);
             mMap.addMarker(new MarkerOptions().position(telAviv).title(poi.name));
