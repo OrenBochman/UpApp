@@ -53,7 +53,7 @@ public class PhotoIntentService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         String photoId = processIntent(intent);
-        Log.e(Debug.getTag(), String.format("onHandleIntent: %s ", photoId));
+        Log.i(Debug.getTag(), String.format("onHandleIntent: %s ", photoId));
 
         getPhoto(photoId);
 
@@ -84,8 +84,9 @@ public class PhotoIntentService extends IntentService {
             final List<PhotoMetadata> photoMetadatas = place.getPhotoMetadatas();
             if(photoMetadatas==null){
                 //insert a null into the db
-                PlacePhoto placePhoto = new PlacePhoto(placeId, null);
-                mPoiRepository.insertPhoto(placePhoto);
+                //PlacePhoto placePhoto = new PlacePhoto(placeId, null);
+                Log.i(TAG, "Place photo not found: ");
+                //mPoiRepository.insertPhoto(placePhoto);
                 return;
             }
             // Get the photo metadata.
@@ -103,15 +104,17 @@ public class PhotoIntentService extends IntentService {
                 Bitmap bitmap = fetchPhotoResponse.getBitmap();
                 PlacePhoto placePhoto = new PlacePhoto(placeId, bitmap);
                 mPoiRepository.insertPhoto(placePhoto);
+                Log.i(TAG, String.format("Added photo %d, %d : ", bitmap.getWidth(),bitmap.getHeight()));
+
                 //imageView.setImageBitmap(bitmap);
             }).addOnFailureListener((exception) -> {
                 if (exception instanceof ApiException) {
                     ApiException apiException = (ApiException) exception;
                     int statusCode = apiException.getStatusCode();
                     // Handle error with given status code.
-                    Log.e(TAG, "Place photo not found: " + exception.getMessage());
+                    Log.i(TAG, "Place photo not found: ");
                     PlacePhoto placePhoto = new PlacePhoto(placeId, null);
-                    mPoiRepository.insertPhoto(placePhoto);
+
                 }
             });
         });
