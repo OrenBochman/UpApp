@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Shared Preferences Utilities.
  *
- * TODO: Inject this as a singleton using dagger and depend on the app for context.
+ * TODO: all write ops should be done offline.
  */
 public class SpUtils {
 
@@ -36,84 +36,87 @@ public class SpUtils {
     private static final String MAP_TYPE_DEFAULT= "normal";
 
     public static int getRadius(Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getInt(RADIUS, RADIUS_DEFAULT);
+        return  ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE).getInt(RADIUS, RADIUS_DEFAULT);
     }
 
     public static Set<String> getMapType(Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getStringSet(PLACE_TYPE, new HashSet<String>());
+        return ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE).getStringSet(PLACE_TYPE, new HashSet<String>());
     }
 
     public static String getPlaceType(Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getString(MAP_TYPE, MAP_TYPE_DEFAULT);
+        return ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE).getString(MAP_TYPE, MAP_TYPE_DEFAULT);
     }
     public static int getIsMetric(Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getInt(IS_METRIC, 1);
+        return ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE).getInt(IS_METRIC, 1);
     }
 
-    public static void setIsMetric(int isMetric, Context ctx) {
-        setInt(isMetric,IS_METRIC,ctx);
-    }
+    public static void setIsMetric(int isMetric, Context ctx) { setInt(isMetric,IS_METRIC,ctx); }
 
     public static String getLastSearch(Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-
-        String query = sharedPreferences.getString("query", "");
-        return query;
+        return ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE).getString(QUERY, "");
     }
 
-    public static void setLastSearch(String query, //LatLng location,
-                                     Context ctx) {
-        setString(query,QUERY,ctx);
+    public static void setLastSearch(String query, Context ctx) {
+       setString(query,QUERY,ctx);
     }
 
     public static double getLat(Context ctx) {
-        return ctx.getSharedPreferences(LAT, Context.MODE_PRIVATE).
-                getFloat(LAT, LAT_DEFAULT);
+        return ctx.getSharedPreferences(LAT, Context.MODE_PRIVATE).getFloat(LAT, LAT_DEFAULT);
     }
 
-    public static void setLat(Double lat, Context ctx) {
+    public static void setLat(Double lat, Context ctx) { setFloat(lat, LAT, ctx); }
 
-        setFloat(lat, LAT, ctx);
-    }
-
-    public static void setLng(Double lat, Context ctx) {
-
-        setFloat(lat, LNG, ctx);
-    }
+    public static void setLng(Double lat, Context ctx) { setFloat(lat, LNG, ctx); }
 
     public static double getLng(Context ctx) {
-
         return ctx.getSharedPreferences(LNG, Context.MODE_PRIVATE).getFloat(LNG, LNG_DEFAULT);
     }
 
-    // Internal setters per DRY ///////////////////////////////////////////////////////////////////
+    // Internal setters per DRY + Threaded as SP access is diskI/O /////////////////////////////////
 
     private static void setInt(int x, String key, Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME,
-                Context.MODE_PRIVATE);
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(key, x);
-        editor.apply();
+
+        new Thread(() -> {
+
+            android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME,
+                    Context.MODE_PRIVATE);
+            android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt(key, x);
+            editor.apply();
+
+        }).run();
+
+
+
     }
 
     private static void setString(String x, String key, Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME,
-                Context.MODE_PRIVATE);
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(key, x);
-        editor.apply();
+
+        new Thread(() -> {
+
+            android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME,
+                    Context.MODE_PRIVATE);
+            android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(key, x);
+            editor.apply();
+
+        }).run();
+
+
     }
 
     private static void setFloat(Double x, String key, Context ctx) {
-        android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME,
-                Context.MODE_PRIVATE);
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat(key, x.floatValue());
-        editor.apply();
+
+        new Thread(() -> {
+            android.content.SharedPreferences sharedPreferences = ctx.getSharedPreferences(NAME,
+                    Context.MODE_PRIVATE);
+            android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putFloat(key, x.floatValue());
+            editor.apply();
+
+        }).run();
+
+
     }
 
 }
