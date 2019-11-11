@@ -1,8 +1,28 @@
 package org.bochman.upapp.favourites;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import org.bochman.upapp.R;
+import org.bochman.upapp.SmartActivity;
+import org.bochman.upapp.data.enteties.PlacePhoto;
+import org.bochman.upapp.data.enteties.Poi;
+import org.bochman.upapp.data.viewmodel.PoiViewModel;
+import org.bochman.upapp.masterDetail.POIMasterActivity;
+import org.bochman.upapp.settings.SettingsActivity;
+import org.bochman.upapp.utils.Debug;
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
 import androidx.lifecycle.LiveData;
@@ -11,51 +31,31 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.opengl.GLDebugHelper;
-import android.os.Bundle;
-import android.util.DebugUtils;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-
-import org.bochman.upapp.data.enteties.PlacePhoto;
-import org.bochman.upapp.data.viewmodel.PoiViewModel;
-import org.bochman.upapp.masterDetail.POIMasterActivity;
-import org.bochman.upapp.R;
-import org.bochman.upapp.power.PowerWatcher;
-import org.bochman.upapp.settings.SettingsActivity;
-import org.bochman.upapp.utils.Debug;
-import org.bochman.upapp.data.enteties.Poi;
-import org.bochman.upapp.wifi.ConnectivityWatcher;
-import org.parceler.Parcels;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.bochman.upapp.utils.SpUtils.getLastSearch;
-import static org.bochman.upapp.utils.SpUtils.setLastSearch;
 
 /**
  * An activity representing a list of Favourites.
  */
-public class FavouritesActivity extends AppCompatActivity {
-
+public class FavouritesActivity extends SmartActivity {
 
     FavouritesAdapter adapter;
     RecyclerView recyclerView;
-    /**  the key used by POIListActivity for passing a favourite via an intent */
+    /**
+     * the key used by POIListActivity for passing a favourite via an intent
+     */
     public static final String POI_KEY = "POI";
 
     Poi poi;
-    /** the list of favourites. */
+    /**
+     * the list of favourites.
+     */
     private List<Poi> favouritesList;
-    /** the hashmap of photos */
+    /**
+     * the hashmap of photos
+     */
     private HashMap<String, Bitmap> photoMap;
-    /** the view model */
+    /**
+     * the view model
+     */
     private PoiViewModel mPoiViewModel;
 
     @Override
@@ -73,9 +73,9 @@ public class FavouritesActivity extends AppCompatActivity {
         }
 
         //get the favourite and add to the list
-        Poi poi = Parcels.unwrap(getIntent().getParcelableExtra(FavouritesActivity.POI_KEY) );
+        Poi poi = Parcels.unwrap(getIntent().getParcelableExtra(FavouritesActivity.POI_KEY));
 
-        Log.i(Debug.getTag(),"POI in intent is = "+ poi.toString());
+        Log.i(Debug.getTag(), "POI in intent is = " + poi.toString());
 
 
         //get the view model
@@ -84,22 +84,22 @@ public class FavouritesActivity extends AppCompatActivity {
         mPoiViewModel.insert(poi);
         //get the data from the view model
         final LiveData<List<PlacePhoto>> favImages = mPoiViewModel.getFavImages();
-        if(favImages.getValue() != null) {
+        if (favImages.getValue() != null) {
             photoMap = convertToHashmap(favImages.getValue());
-        }else{
-            photoMap= new HashMap<>();
+        } else {
+            photoMap = new HashMap<>();
         }
         final LiveData<List<Poi>> allFavs = mPoiViewModel.getAllFavs();
-        if(favImages.getValue() != null) {
+        if (favImages.getValue() != null) {
             favouritesList = allFavs.getValue();
-        }else{
-            favouritesList=new ArrayList<>();
+        } else {
+            favouritesList = new ArrayList<>();
         }
 
         recyclerView = findViewById(R.id.favouritesRecyclerView);
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FavouritesAdapter(this, favouritesList,photoMap);
+        adapter = new FavouritesAdapter(this, favouritesList, photoMap);
         recyclerView.setAdapter(adapter);
 
 
@@ -122,11 +122,11 @@ public class FavouritesActivity extends AppCompatActivity {
         });
 
 
-        poi.isFavourite=1;
+        poi.isFavourite = 1;
         mPoiViewModel.update(poi);
     }
 
-    HashMap<String,Bitmap> convertToHashmap(List<PlacePhoto> photos) {
+    HashMap<String, Bitmap> convertToHashmap(List<PlacePhoto> photos) {
         HashMap<String, Bitmap> photoMap = new HashMap<>();
         for (PlacePhoto photo : photos) {
             photoMap.put(photo.id, photo.bitmap);
@@ -150,7 +150,7 @@ public class FavouritesActivity extends AppCompatActivity {
 
     /**
      * Menu click handler.
-     *
+     * <p>
      * Navigate back to parent activity.
      *
      * @param item - the menu item being accessed
@@ -158,7 +158,7 @@ public class FavouritesActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_preferences:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
@@ -178,44 +178,4 @@ public class FavouritesActivity extends AppCompatActivity {
         }
 
     }
-
-
-    /**
-     * resume lifecycle handler
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        //Feature start charging monitoring service
-        IntentFilter ifilter =new IntentFilter();
-        ifilter.addAction(Intent.ACTION_POWER_CONNECTED);
-        ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-        ifilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(powerWatcher, ifilter);
-
-        //Feature start wifi monitoring service - will not work for api >= 28 pie
-        registerReceiver(connectivityWatcher, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-
-    }
-
-    /**
-     *
-     */
-    private ConnectivityWatcher connectivityWatcher = new ConnectivityWatcher();
-    private PowerWatcher powerWatcher = new PowerWatcher();
-
-    /**
-     * pause lifecycle handler
-     */
-    @Override
-    public void onPause() {
-        super.onPause();
-
-
-        //Feature: suspend wifi monitoring service
-        unregisterReceiver(connectivityWatcher);
-        unregisterReceiver(powerWatcher);
-    }
-
 }

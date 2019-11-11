@@ -2,6 +2,22 @@
 
 Android Capstone Project.
 
+## Requirements:
+
+1. observing and responding to wifi & power conectivity changes.
+2. search near-by & with & without keyword.
+3. persisting last search for next use.
+4. calculate distance of each point of interest.
+5. display place name, address & the result in a recyclerview which
+6. responds to click events by showing the place on the map and
+9. responds to long click by showing a menu with:
+10. sharing a place
+11. show last search results if offline.
+12. support adaptive layouts - master-detail for  tablet and handset.
+13. a setting icon in the toolbar openning a preference with:  
+15. clearing the favourites
+16. setting the units
+
 ## Some Features:
 
 * MVVM architecture
@@ -24,10 +40,35 @@ Android Capstone Project.
 ## Some patterns in use :
 
 * Model View ViewMode (MVVM)
+* observable
 * viewHolder patten
-* master detail pattern
+* master-detail pattern
 * singleton patten
 * [repository pattern](https://developer.android.com/jetpack/docs/guide) Repository is a facade for accessing the db off the main thread.
+
+# Test Plan - Test By feature:
+
+##Testing plan + Refactoring for testability.
+
+ 1. wifi - These were traditionally done using a **BroadcastReceiver**. When BR are defined in their
+      own file they cannot request permissions or access the view model. So BR are refactored into 
+      an abstract parent activity that also provides access to the ViewModel and will get methods 
+      to access the state as well as SharedPreference methods all in a single object.
+   a. Observing changes:
+      - changes to power and connection are easly done manually via emulator. (don't know how to automate - ask Oran)
+      - changes are reported via intents and android components - possible to mock but not easy to do so
+      - setting the view model LiveData can be be set / observed / tested independently. 
+   b. Responding to changes: 
+       - currently the app just sends a toast this is hard to test and should be refactored so that:
+       - the BR fires an intent to the activity which sends the toast or 
+       - updating the view-model - which sends the toasts or better yet fires a sank-bar 
+       - Note: getting internet connectivity broadcast has now been deprecaded so another method need to be used..   
+   c. check un/subscription in lifecycle events + config changes.
+ 2. Search api.
+   a. real world challenges include: asynchronicity, timeouts, bad api keys, permissions, networking.
+      * use integration tests to check system resiliency.
+      * use unit tests + mocks to check sub tests api calls are correct.
+    b. 
 
 # References
 

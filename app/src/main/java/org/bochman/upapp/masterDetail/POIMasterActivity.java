@@ -3,7 +3,6 @@ package org.bochman.upapp.masterDetail;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -32,18 +31,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.bochman.upapp.R;
+import org.bochman.upapp.SmartActivity;
 import org.bochman.upapp.api.HttpPoiSearchIntentService;
 import org.bochman.upapp.api.PoiIntentService;
 import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
-import org.bochman.upapp.power.PowerWatcher;
 import org.bochman.upapp.settings.SettingsActivity;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
 import org.bochman.upapp.utils.SpUtils;
-import org.bochman.upapp.wifi.ConnectivityWatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,7 +50,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -74,7 +71,7 @@ import static org.bochman.upapp.utils.SpUtils.setLastSearch;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class POIMasterActivity extends SmartActivity implements OnMapReadyCallback {
 
 
     /**
@@ -279,24 +276,7 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
 
         // Feature: restoring saved search.
         queryText.setText(getLastSearch(this));
-
-        //Feature start charging monitoring service
-        IntentFilter ifilter =new IntentFilter();
-        ifilter.addAction(Intent.ACTION_POWER_CONNECTED);
-        ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-        ifilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(powerWatcher, ifilter);
-
-        //Feature start wifi monitoring service - will not work for api >= 28 pie
-        registerReceiver(connectivityWatcher, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-
     }
-
-    /**
-     *
-     */
-    private ConnectivityWatcher connectivityWatcher = new ConnectivityWatcher();
-    private PowerWatcher powerWatcher = new PowerWatcher();
 
     /**
      * pause lifecycle handler
@@ -307,10 +287,6 @@ public class POIMasterActivity extends AppCompatActivity implements OnMapReadyCa
 
         // Feature: saving last search.
         setLastSearch(queryText.getText().toString(), getApplicationContext());
-
-        //Feature: suspend wifi monitoring service
-        unregisterReceiver(connectivityWatcher);
-        unregisterReceiver(powerWatcher);
     }
 
     /**

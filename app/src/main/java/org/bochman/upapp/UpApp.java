@@ -34,12 +34,8 @@ public class UpApp extends Application {
 
         CacheUtils.initializeCache(this);
 
-        //this.setString(R.string.google_maps_key,);
         // Initialize FusedLocation APIs
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        //init DB  - when upgrading versions, kill the original tables by using fallbackToDestructiveMigration()
-        //poiDatabase = Room.databaseBuilder(this, PoiDatabase.class, PoiDatabase.NAME).fallbackToDestructiveMigration().build();
 
         mPoiRepository = new PoiRepository(this);
 

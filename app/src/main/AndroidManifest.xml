@@ -68,9 +68,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <receiver android:name=".wifi.ConnectivityWatcher" />
-
-        <receiver android:name=".power.PowerWatcher" />
+        <receiver android:name=".SmartActivity$ConnectivityWatcher" />
+        <receiver android:name=".SmartActivity$PowerWatcher" />
 
         <service android:name=".api.PoiIntentService"
             android:exported="false" />

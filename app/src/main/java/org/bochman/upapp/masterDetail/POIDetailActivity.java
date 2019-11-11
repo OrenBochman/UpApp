@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.bochman.upapp.R;
+import org.bochman.upapp.SmartActivity;
 import org.bochman.upapp.data.enteties.Poi;
 import org.parceler.Parcels;
 
@@ -31,7 +32,7 @@ import org.parceler.Parcels;
  * item details are presented side-by-side with a list of items
  * in a {@link POIMasterActivity}.
  */
-public class POIDetailActivity extends FragmentActivity implements OnMapReadyCallback {
+public class POIDetailActivity extends SmartActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     public static final String ARG_ITEM_ID = "item_id";
