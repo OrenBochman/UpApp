@@ -7,7 +7,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.bochman.upapp.BuildConfig;
-import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.repository.PoiRepository;
 import org.bochman.upapp.utils.SpUtils;
@@ -17,7 +16,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -62,7 +60,7 @@ public class HttpPoiSearchIntentService extends IntentService {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder().url("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userLat + "," + userLng + "&radius=" + radius + "&keyword=" + keyword + "&key=" + API_KEY + "\n").build();
-        Log.i(TAG, "maling request: " + request.url());
+        Log.i(TAG, "making request: " + request.url());
         try {
             Response response = client.newCall(request).execute();
             if (response.isSuccessful()) {
