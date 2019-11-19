@@ -1,4 +1,4 @@
-package org.bochman.upapp.favourites;
+package org.bochman.upapp.presentation.favourites;
 
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -7,13 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.bochman.upapp.R;
-import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
