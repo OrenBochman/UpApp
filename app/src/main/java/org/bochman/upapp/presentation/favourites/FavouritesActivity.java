@@ -1,4 +1,4 @@
-package org.bochman.upapp.favourites;
+package org.bochman.upapp.presentation.favourites;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,12 +8,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import org.bochman.upapp.R;
-import org.bochman.upapp.SmartActivity;
+import org.bochman.upapp.presentation.SmartActivity;
 import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
-import org.bochman.upapp.masterDetail.POIMasterActivity;
-import org.bochman.upapp.settings.SettingsActivity;
+import org.bochman.upapp.presentation.masterDetail.POIMasterActivity;
+import org.bochman.upapp.presentation.settings.SettingsActivity;
 import org.bochman.upapp.utils.Debug;
 import org.parceler.Parcels;
 
@@ -96,12 +96,13 @@ public class FavouritesActivity extends SmartActivity {
             favouritesList = new ArrayList<>();
         }
 
+        //TODO: use new view binding here for type/null safe code
         recyclerView = findViewById(R.id.favouritesRecyclerView);
-        assert recyclerView != null;
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FavouritesAdapter(this, favouritesList, photoMap);
-        recyclerView.setAdapter(adapter);
-
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            adapter = new FavouritesAdapter(this, favouritesList, photoMap);
+            recyclerView.setAdapter(adapter);
+        }
 
         allFavs.observe(this, new Observer<List<Poi>>() {
             @Override
