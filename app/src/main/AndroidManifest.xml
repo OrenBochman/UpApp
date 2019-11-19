@@ -34,10 +34,10 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <activity
-            android:name=".settings.SettingsActivity"
+            android:name=".presentation.settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".masterDetail.POIMasterActivity"
+            android:name=".presentation.masterDetail.POIMasterActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -46,30 +46,30 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".masterDetail.POIDetailActivity"
+            android:name=".presentation.masterDetail.POIDetailActivity"
             android:label="@string/title_item_detail"
-            android:parentActivityName=".masterDetail.POIMasterActivity"
+            android:parentActivityName=".presentation.masterDetail.POIMasterActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:targetApi="jelly_bean">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bochman.upapp.masterDetail.POIMasterActivity" />
+                android:value=".presentation.masterDetail.POIMasterActivity" />
         </activity>
         <activity
-            android:name=".favourites.FavouritesActivity"
-            android:parentActivityName=".masterDetail.POIMasterActivity"
+            android:name=".presentation.favourites.FavouritesActivity"
+            android:parentActivityName=".presentation.masterDetail.POIMasterActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:targetApi="jelly_bean">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.bochman.upapp.masterDetail.POIMasterActivity" />
+                android:value=".presentation.masterDetail.POIMasterActivity" />
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <receiver android:name=".SmartActivity$ConnectivityWatcher" />
-        <receiver android:name=".SmartActivity$PowerWatcher" />
+        <receiver android:name=".presentation.SmartActivity$ConnectivityWatcher" />
+        <receiver android:name=".presentation.SmartActivity$PowerWatcher" />
 
         <service android:name=".api.PoiIntentService"
             android:exported="false" />
@@ -81,7 +81,7 @@
         <!-- make sure within the application tag, otherwise app will crash with XmlResourceParser errors -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.codepath.fileprovider"
+            android:authorities="org.bochman.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

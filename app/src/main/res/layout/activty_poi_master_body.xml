@@ -10,7 +10,7 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="org.bochman.upapp.masterDetail.POIMasterActivity">
+    tools:context=".presentation.masterDetail.POIMasterActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/item_list"
@@ -20,7 +20,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context="org.bochman.upapp.masterDetail.POIMasterActivity"
+        tools:context=".presentation.masterDetail.POIMasterActivity"
         tools:listitem="@layout/vholder_poi_item" />
 
 </LinearLayout>
