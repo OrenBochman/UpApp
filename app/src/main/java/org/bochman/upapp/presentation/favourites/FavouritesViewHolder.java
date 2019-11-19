@@ -1,7 +1,6 @@
-package org.bochman.upapp.favourites;
+package org.bochman.upapp.presentation.favourites;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -26,6 +25,6 @@ class FavouritesViewHolder extends RecyclerView.ViewHolder {
         ratingBar =view.findViewById(R.id.rating);
         //favourite button and share.
 
-    } // Viewholder [:-}~
+    }
 
-} // Viewholder :-}8
+}
