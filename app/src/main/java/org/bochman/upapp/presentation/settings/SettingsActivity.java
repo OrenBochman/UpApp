@@ -1,4 +1,4 @@
-package org.bochman.upapp.settings;
+package org.bochman.upapp.presentation.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import org.bochman.upapp.R;
 import org.bochman.upapp.data.repository.PoiRepository;
 import org.bochman.upapp.databinding.ActivtySettingsBinding;
-import org.bochman.upapp.masterDetail.POIMasterActivity;
+import org.bochman.upapp.presentation.masterDetail.POIMasterActivity;
 
 import java.util.Objects;
 
