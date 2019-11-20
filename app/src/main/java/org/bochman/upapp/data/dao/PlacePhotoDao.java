@@ -19,6 +19,9 @@ public interface PlacePhotoDao {
     @Query("Select bitmap From PlacePhoto where id = :id")
     LiveData<Bitmap> getPhoto(String id);
 
+    @Query("Select count(bitmap) From PlacePhoto where id = :id")
+    int getPhotoCount(String id);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insertPhoto(PlacePhoto placePhoto);
 
