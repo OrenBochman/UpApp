@@ -50,15 +50,14 @@ Android Capstone Project.
 
 # References
 
-Modern development relies on databases like:
- 
+Modern development relies on accessing numerous information sources such as:
  * StackOverflow ❓
  * Code path 🛣
  * Google & Android developer docs 🍭
  * Blogposts & Articles Ⓜ
  * GoogleI/O & Android Dev Summit talks, other Videos 🎥
  * Codelabs 🧪
- * Wikipedia / Refrence Books 📚
+ * Wikipedia / Reference Books 📚
 
 ## The following information & code snippets proved useful:
 
@@ -111,4 +110,4 @@ Modern development relies on databases like:
   * 📚[Strategy Pattern](https://en.wikipedia.org/wiki/Strategy_pattern)
   * ❓[Android M - check runtime permission - how to determine if the user checked “Never ask again”?](https://stackoverflow.com/questions/30719047/android-m-check-runtime-permission-how-to-determine-if-the-user-checked-nev)
   * ❓[What is the benefit of ViewHolder pattern in android?](https://stackoverflow.com/questions/21501316/what-is-the-benefit-of-viewholder-pattern-in-android)
-
+  * Ⓜ[Clean Architecture Tutorial for Android: Getting Started](https://www.raywenderlich.com/3595916-clean-architecture-tutorial-for-android-getting-started)
