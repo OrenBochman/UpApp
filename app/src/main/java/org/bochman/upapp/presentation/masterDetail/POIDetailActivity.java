@@ -1,14 +1,9 @@
-package org.bochman.upapp.masterDetail;
+package org.bochman.upapp.presentation.masterDetail;
 
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.widget.Toolbar;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.ActionBar;
 import androidx.core.app.NavUtils;
-import androidx.fragment.app.FragmentActivity;
 
 import android.view.MenuItem;
 
@@ -20,7 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.bochman.upapp.R;
-import org.bochman.upapp.SmartActivity;
+import org.bochman.upapp.presentation.SmartActivity;
 import org.bochman.upapp.data.enteties.Poi;
 import org.parceler.Parcels;
 
