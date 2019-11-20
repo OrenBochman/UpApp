@@ -17,7 +17,6 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.bochman.upapp.BuildConfig;
-import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.repository.PoiRepository;
 import org.bochman.upapp.utils.Debug;
@@ -26,7 +25,6 @@ import org.bochman.upapp.utils.SpUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
