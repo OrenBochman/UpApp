@@ -1,6 +1,5 @@
 package org.bochman.upapp.utils;
 
-import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -20,7 +19,6 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bochman.upapp.BuildConfig;
-import org.bochman.upapp.UpApp;
 import org.bochman.upapp.data.enteties.Poi;
 
 import java.util.Arrays;
