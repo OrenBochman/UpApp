@@ -1,10 +1,9 @@
-package org.bochman.upapp.masterDetail;
+package org.bochman.upapp.presentation.masterDetail;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.text.Html;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -13,14 +12,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.squareup.picasso.Picasso;
+//import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.bochman.upapp.data.enteties.PlacePhoto;
-import org.bochman.upapp.favourites.FavouritesActivity;
+import org.bochman.upapp.presentation.favourites.FavouritesActivity;
 import org.bochman.upapp.R;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.data.enteties.Poi;
@@ -28,6 +26,12 @@ import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.SpUtils;
 import org.parceler.Parcels;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,10 +44,14 @@ import java.util.List;
  */
 public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
 
+    private static final int LOCAL_STORAGE = 1;
+    private static final int EXERNAL_STORAGE = 2;
+    private static final int DB_STORAGE = 3;
+
     // cached copy of poi data.
     private  List<Poi> mValues;
     // cached copy of place photos.
-    private HashMap<String,Bitmap> mPhotos;
+    //private HashMap<String,Bitmap> mPhotos;
     // cache for the current location - updated whenever the data is updated.
     private LatLng latlng;
     // cache of flag indicating if master and detail are in the same activity.
@@ -63,7 +71,7 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         this.mValues = items;
         this.mParentActivity = parent;
         this.mTwoPane = twoPane;
-        this.mPhotos = mPhotos;
+        //this.mPhotos = mPhotos;
         getLatLng();
 
     } // SimpleItemRecyclerViewAdapter [:-}~
@@ -78,6 +86,7 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
         return new POIViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(final POIViewHolder holder, int position) {
         Poi poi=mValues.get(position);
@@ -88,27 +97,27 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
                         new LatLng(poi.lat,poi.lng),
                         SpUtils.getIsMetric(mParentActivity.getApplicationContext())==1));
 
-        Bitmap bitmap=mPhotos.get(poi.id);
+        String imagePath = poi.photoUri;
+        if (imagePath.length() != 0) {
+            Log.i(Debug.getTag(), String.format("getting bitmap from %s ", imagePath));
+            try {
+                FileInputStream out = mParentActivity.openFileInput(imagePath);
+                Bitmap bitmap = BitmapFactory.decodeStream(out);
+                if(bitmap==null)
+                    Log.i(Debug.getTag(),String.format("Failed to decode bitmap %s",imagePath));
+                else {
+                    holder.mPhoto.setImageBitmap(bitmap);
+                    Log.i(Debug.getTag(), String.format("Bitmap %s is  size: ", bitmap.getHeight() * bitmap.getWidth()));
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
 
-        if(bitmap==null){
+
+        } else {
             holder.mPhoto.setImageDrawable(mParentActivity.getResources().getDrawable(R.drawable.ic_photo_black_24));
             Log.i(Debug.getTag(),String.format("Bitmap %s is  null",poi.id));
-        }else{
-            holder.mPhoto.setImageBitmap(bitmap);
-            Log.i(Debug.getTag(),String.format("Bitmap %s is  size: ",bitmap.getHeight()*bitmap.getWidth()));
-
         }
-
-//        if (holder.mPhoto != null)
-//            if( poi.photoUri!=null && !poi.photoUri.isEmpty()) {
-//            Picasso
-//                    .get()
-//                    .load(poi.photoUri)
-//                    .into(holder.mPhoto);
-//            }else{
-//                holder.mPhoto.setImageDrawable(mParentActivity.getResources().getDrawable(R.drawable.ic_photo_black_24));
-//            }
-
 
         holder.itemView.setTag(poi);
         //set the click handlers
@@ -129,9 +138,9 @@ public class POIsAdapter extends RecyclerView.Adapter<POIViewHolder> {
     }
 
     public void setPhotos(HashMap<String,Bitmap> photos) {
-        mPhotos = photos;
-        Log.e(Debug.getTag(), String.format("setPhotos: length %d ", photos.size()));
-        notifyDataSetChanged();
+        //mPhotos = photos;
+        //Log.e(Debug.getTag(), String.format("setPhotos: length %d ", photos.size()));
+        //notifyDataSetChanged();
     }
 
 
