@@ -1,4 +1,4 @@
-package org.bochman.upapp;
+package org.bochman.upapp.presentation;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -11,9 +11,9 @@ import android.os.BatteryManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.bochman.upapp.presentation.favourites.FavouritesActivity;
 import org.bochman.upapp.utils.Debug;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * this activity provides shared behaviours for
@@ -23,15 +23,15 @@ import androidx.appcompat.app.AppCompatActivity;
  *  * location
  *  * permission requests
  * <p>
- * use in {@link org.bochman.upapp.masterDetail.POIMasterActivity},
- * {@link org.bochman.upapp.masterDetail.POIDetailActivity} and
- * {@link org.bochman.upapp.favourites.FavouritesActivity}
+ * use in {@link org.bochman.upapp.presentation.masterDetail.POIMasterActivity},
+ * {@link org.bochman.upapp.presentation.masterDetail.POIDetailActivity} and
+ * {@link FavouritesActivity}
  *
  * TODO: supplant the toast() function with an SAM interface (Single Action Method)
  *       implement it via a delegate Toast/SanckBar/tester and inject via Dagger2.
  *
  */
-public abstract class SmartActivity extends AppCompatActivity {
+public abstract class SmartActivity extends PrudentActivity {
 
     /**
      * status watchers.
@@ -128,8 +128,4 @@ public abstract class SmartActivity extends AppCompatActivity {
         }
     }
 
-    void toast(String msg) {
-        Log.v(Debug.getTag(), msg);
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
 }
