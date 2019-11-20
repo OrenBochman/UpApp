@@ -1,4 +1,4 @@
-package org.bochman.upapp.masterDetail;
+package org.bochman.upapp.presentation.masterDetail;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,13 +31,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.bochman.upapp.R;
-import org.bochman.upapp.SmartActivity;
+import org.bochman.upapp.presentation.SmartActivity;
 import org.bochman.upapp.api.HttpPoiSearchIntentService;
 import org.bochman.upapp.api.PoiIntentService;
 import org.bochman.upapp.data.enteties.PlacePhoto;
 import org.bochman.upapp.data.enteties.Poi;
 import org.bochman.upapp.data.viewmodel.PoiViewModel;
-import org.bochman.upapp.settings.SettingsActivity;
+import org.bochman.upapp.presentation.settings.SettingsActivity;
 import org.bochman.upapp.utils.Debug;
 import org.bochman.upapp.utils.LocationUtils;
 import org.bochman.upapp.utils.PlacesUtils;
@@ -72,7 +72,6 @@ import static org.bochman.upapp.utils.SpUtils.setLastSearch;
  * item details side-by-side using two vertical panes.
  */
 public class POIMasterActivity extends SmartActivity implements OnMapReadyCallback {
-
 
     /**
      * the list of places of interest
@@ -248,24 +247,6 @@ public class POIMasterActivity extends SmartActivity implements OnMapReadyCallba
         SpUtils.setLat(location.getLatitude(), this);
         SpUtils.setLng(location.getLongitude(), this);
     }
-
-//    /**
-//     * TODO: remove this method.
-//     *
-//     * @param query
-//     */
-//    void PoiSearchOld(String query) {
-//        // get places nearby
-//        placesUtils = PlacesUtils.getInstance(getApplicationContext());
-//        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//            placesUtils.fetchCurrentPlaces(placesList);
-//
-//        } else {
-//            getLocationPermission();
-//            Toast.makeText(this, "Permission Issue in PoiSearch", Toast.LENGTH_LONG).show();
-//        }
-//    }
-
 
     /**
      * resume lifecycle handler
